@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Future of Domain Specific Languages</title>
+  <meta name="description" content="Where DSLs are headed — LLMs, no-code, probabilistic programming, and language-oriented paradigms." />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <style>
+
+    .page-header {
+      padding: 5rem 0 3.5rem;
+      border-bottom: 1px solid var(--border-light);
+      background: radial-gradient(ellipse 60% 50% at 70% 30%, rgba(46,110,110,0.09) 0%, transparent 70%);
+    }
+
+    /* ── HORIZON CARDS ───────────────────────────────── */
+    .horizon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .horizon-card {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .horizon-card::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle at top right, rgba(181,74,28,0.07), transparent 70%);
+      pointer-events: none;
+    }
+
+    .horizon-num {
+      font-family: var(--font-mono);
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--parchment);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .horizon-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2em 0.7em;
+      border-radius: 20px;
+      margin-bottom: 0.75rem;
+    }
+
+    .horizon-tag.near   { background: #D8E8D8; color: var(--sage);  border: 1px solid var(--sage); }
+    .horizon-tag.mid    { background: #F5E6C8; color: var(--amber); border: 1px solid var(--amber); }
+    .horizon-tag.far    { background: #C8DEDE; color: var(--teal);  border: 1px solid var(--teal); }
+
+    .horizon-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .horizon-card p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-mid);
+    }
+
+    /* ── ANIMATED SPECTRUM DIAGRAM ───────────────────── */
+    .spectrum-section {
+      padding: 3rem 0;
+    }
+
+    .spectrum-wrapper {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      overflow-x: auto;
+    }
+
+    .spectrum-bar-container {
+      position: relative;
+      height: 60px;
+      margin: 2rem 0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .spectrum-bar {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right,
+        var(--rust-pale) 0%,
+        var(--amber-light) 25%,
+        #B8D4B8 50%,
+        #8EC8C8 75%,
+        #C8B8E0 100%
+      );
+      border-radius: 4px;
+    }
+
+    .spectrum-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+      margin-top: 0.5rem;
+    }
+
+    .spectrum-items {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .spectrum-item {
+      text-align: center;
+      flex: 1;
+    }
+
+    .spectrum-item-name {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .spectrum-item-eg {
+      font-size: 0.65rem;
+      color: var(--ink-soft);
+      margin-top: 0.2rem;
+    }
+
+    /* ── LLM + DSL SECTION ───────────────────────────── */
+    .llm-section {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 4rem 0;
+      margin: 3rem 0;
+    }
+
+    .llm-section h2,
+    .llm-section h3 { color: var(--cream); }
+    .llm-section p { color: var(--parchment); }
+    .llm-section .label { color: var(--amber-light); }
+
+    .llm-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 700px) {
+      .llm-grid { grid-template-columns: 1fr; }
+    }
+
+    .llm-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(200,186,162,0.2);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+
+    .llm-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      color: var(--amber-light);
+    }
+
+    .llm-card p { font-size: 0.92rem; line-height: 1.7; }
+
+    .llm-card pre {
+      font-size: 0.75rem;
+      margin-top: 1rem;
+      background: rgba(0,0,0,0.3);
+      border-left-color: var(--amber);
+    }
+
+    /* ── ANIMATED GRADIENT ORBS ──────────────────────── */
+    @keyframes float-orb {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%       { transform: translateY(-20px) scale(1.05); }
+    }
+
+    .orb-container {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      animation: float-orb var(--dur, 6s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+      opacity: 0.4;
+    }
+
+    .orb-1 { width: 180px; height: 180px; background: var(--rust); left: 10%; top: 20%; --dur: 7s; }
+    .orb-2 { width: 220px; height: 220px; background: var(--amber); left: 40%; top: 10%; --dur: 9s; --delay: 1s; }
+    .orb-3 { width: 160px; height: 160px; background: var(--teal);  left: 65%; top: 30%; --dur: 8s; --delay: 2s; }
+    .orb-4 { width: 120px; height: 120px; background: var(--sage);  left: 20%; top: 50%; --dur: 6s; --delay: 3s; }
+
+    .orb-label {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+    }
+
+    .orb-label h3 {
+      color: white;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .orb-label p {
+      color: rgba(255,255,255,0.75);
+      font-size: 0.9rem;
+      max-width: 320px;
+    }
+
+    /* ── PREDICTION TABLE ────────────────────────────── */
+    .predictions {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    .predictions th {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--border);
+      text-align: left;
+    }
+
+    .predictions td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+    }
+
+    .predictions tr:last-child td { border-bottom: none; }
+    .predictions tr:hover td { background: var(--beige-mid); }
+
+    .pred-trend {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .pred-conf {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .conf-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-light);
+    }
+
+    .conf-dot.filled { background: var(--rust); }
+
+  </style>
+</head>
+<body>
+
+  <div id="nav-placeholder"></div>
+
+  <header class="page-header">
+    <div class="container">
+      <span class="label">// Chapter 03</span>
+      <h1>Future<br/><em style="color:var(--rust)">Directions</em></h1>
+      <p class="mt-3" style="max-width:600px;font-size:1.1rem;">
+        Where is DSL design heading? From LLM-native interfaces to probabilistic programming,
+        the next generation of domain languages is being shaped right now.
+      </p>
+    </div>
+  </header>
+
+  <!-- ── CONVERGENCE TRENDS ─────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="divider"><span class="divider-icon">// convergence</span></div>
+      <p class="reveal" style="font-size:1.1rem;max-width:700px;margin-bottom:3rem;">
+        Three forces are converging to reshape DSL design: the rise of large language models that can
+        interpret natural language as a DSL; the democratisation push of no-code/low-code platforms;
+        and the increasing complexity of problem domains demanding ever-more-specialised languages.
+      </p>
+
+      <!-- Expressiveness vs Generality Spectrum -->
+      <div class="spectrum-section reveal">
+        <span class="label">// the language expressiveness spectrum</span>
+        <div class="spectrum-wrapper">
+          <div class="spectrum-items">
+            <div class="spectrum-item">
+              <div class="spectrum-item-name">Shell commands</div>
+              <div class="spectrum-item-eg">ls -la | grep .txt</div>
+            </div>
+            <div class="spectrum-item">
+              <div class="spectrum-item-name">CSS / SQL</div>
+              <div class="spectrum-item-eg">Pure DSLs</div>
+            </div>
+            <div class="spectrum-item">
+              <div class="spectrum-item-name">Python DSL libs</div>
+              <div class="spectrum-item-eg">SQLAlchemy, Pandas</div>
+            </div>
+            <div class="spectrum-item">
+              <div class="spectrum-item-name">General langs</div>
+              <div class="spectrum-item-eg">Python, Rust</div>
+            </div>
+            <div class="spectrum-item">
+              <div class="spectrum-item-name">Natural Language</div>
+              <div class="spectrum-item-eg">via LLMs</div>
+            </div>
+          </div>
+          <div class="spectrum-bar-container">
+            <div class="spectrum-bar"></div>
+          </div>
+          <div class="spectrum-labels">
+            <span>← more specialised</span>
+            <span>more general →</span>
+          </div>
+          <p style="font-size:0.88rem;color:var(--ink-soft);margin-top:1rem;text-align:center;">
+            The blurring boundary between DSL and natural language is the defining tension of the 2020s
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LLM SECTION ────────────────────────────────────── -->
+  <section class="llm-section">
+    <div class="container">
+      <span class="label">// the llm frontier</span>
+      <h2>LLMs: Natural Language as a DSL Interface</h2>
+      <p class="mt-3" style="max-width:700px;">
+        Large language models are creating a novel category: <em>natural language DSLs</em>.
+        Instead of learning SQL, a data analyst describes what they want in plain English,
+        and the LLM translates it to SQL. The language is still a DSL — but the interface
+        to write it has changed fundamentally.
+      </p>
+
+      <div class="llm-grid">
+        <div class="llm-card">
+          <h3>DSPy — Programming LLMs Declaratively</h3>
+          <p>Stanford's DSPy treats LLM programs as optimisable pipelines. Signatures declare
+          inputs and outputs; modules compose them; an optimiser finds the best prompts automatically.
+          It's a DSL for reasoning about LLM computation.</p>
+          <pre><span style="color:#E8A83E;"># DSPy — a DSL for LLM pipelines</span>
+class RAG(dspy.Module):
+    def __init__(self):
+        self.retrieve = dspy.Retrieve(k=5)
+        self.generate = dspy.ChainOfThought(
+            "context, question -> answer"
+        )
+
+    def forward(self, question):
+        ctx = self.retrieve(question).passages
+        return self.generate(
+            context=ctx,
+            question=question
+        )</pre>
+        </div>
+
+        <div class="llm-card">
+          <h3>LMQL — SQL for Language Models</h3>
+          <p>LMQL (Language Model Query Language) lets you write constrained generation programs:
+          specify token constraints, logical conditions, and multi-turn structure in a language
+          that compiles to optimised LLM calls. It's SQL's "describe what" philosophy applied
+          to language generation.</p>
+          <pre><span style="color:#E8A83E;"># LMQL — constrained LLM generation</span>
+argmax
+  "Q: What is the capital of France?
+   A: [ANSWER]"
+from
+  "gpt-4"
+where
+  len(ANSWER) < 20 and
+  ANSWER in known_capitals</pre>
+        </div>
+
+        <div class="llm-card">
+          <h3>Guidance — Structured Generation</h3>
+          <p>Microsoft's Guidance library provides a template DSL for interleaving generation
+          and constraints. Rather than post-processing LLM output, Guidance steers generation
+          token-by-token — ensuring outputs conform to schemas, grammars, or logical conditions.</p>
+          <pre><span style="color:#E8A83E;"># Guidance — constrained structured output</span>
+with guidance.models.GPT4() as lm:
+    lm += f"""\
+    Extract the following:
+    Name: {gen('name', stop='\n')}
+    Age: {gen('age', regex=r'\d+')}
+    City: {select(['London','Paris','Berlin'],
+                   name='city')}
+    """</pre>
+        </div>
+
+        <div class="llm-card">
+          <h3>Text-to-SQL: The Killer App</h3>
+          <p>Tools like GitHub Copilot, Cursor, and various BI platforms now translate natural
+          language to SQL with high accuracy. This is DSL interpretation at scale — the semantic
+          gap between domain expert and language is being bridged by AI. But the underlying
+          DSL (SQL) remains essential: the LLM still needs a precise target language to generate.</p>
+          <pre><span style="color:#6B5D47;">User:</span> "Show me the top 10 customers by revenue
+       this year who haven't ordered in 30 days"
+
+<span style="color:#E8A83E;">→ Generated SQL:</span>
+SELECT c.name, SUM(o.total) revenue
+FROM customers c JOIN orders o ...
+WHERE o.date >= '2024-01-01'
+  AND c.id NOT IN (
+    SELECT customer_id FROM orders
+    WHERE date > NOW() - INTERVAL '30 days'
+  )
+GROUP BY c.name
+ORDER BY revenue DESC LIMIT 10;</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FUTURE HORIZONS ────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <span class="label">// horizons</span>
+      <h2 class="mb-4">Emerging Directions</h2>
+
+      <div class="horizon-grid">
+
+        <div class="horizon-card reveal">
+          <div class="horizon-num">01</div>
+          <span class="horizon-tag near">Near-term</span>
+          <h3>Probabilistic Programming Languages</h3>
+          <p>PPLs like Stan, Pyro, and Gen allow statisticians to express probabilistic models
+          declaratively and run exact or approximate inference automatically. They are DSLs where
+          the domain is Bayesian reasoning — and they're becoming central to machine learning,
+          epidemiology, and quantitative finance. Stan's modelling language, for instance, reads
+          like a statistics textbook.</p>
+          <pre style="margin-top:1rem;font-size:0.72rem;">// Stan — a DSL for Bayesian inference
+model {
+  mu ~ normal(0, 10);   // prior
+  sigma ~ exponential(1);
+  y ~ normal(mu, sigma); // likelihood
+}</pre>
+        </div>
+
+        <div class="horizon-card reveal reveal-delay-1">
+          <div class="horizon-num">02</div>
+          <span class="horizon-tag near">Near-term</span>
+          <h3>Domain-Specific Type Systems</h3>
+          <p>Languages like Idris 2 and Lean 4 allow types to encode domain constraints with
+          mathematical precision — proving at compile time that a physical simulation respects
+          dimensional analysis, or that a financial model cannot produce negative balances.
+          The domain is encoded in the type system itself, making incorrect programs literally
+          inexpressible.</p>
+        </div>
+
+        <div class="horizon-card reveal reveal-delay-2">
+          <div class="horizon-num">03</div>
+          <span class="horizon-tag mid">Mid-term</span>
+          <h3>Language-Oriented Programming</h3>
+          <p>Language Workbenches (MPS, Racket, Spoofax) allow developers to create new DSLs
+          as easily as they create new classes. The dream: for every problem domain, spin up
+          a precise language in hours, not months. JetBrains MPS already does this for industrial
+          systems — Airbus uses it to define avionics software specifications in a DSL that
+          domain engineers (not programmers) write directly.</p>
+        </div>
+
+        <div class="horizon-card reveal reveal-delay-3">
+          <div class="horizon-num">04</div>
+          <span class="horizon-tag mid">Mid-term</span>
+          <h3>No-Code DSLs</h3>
+          <p>Platforms like Zapier, Airtable formulas, and Notion formulas are visual DSLs —
+          domain-specific languages expressed through GUIs rather than text. The underlying
+          language semantics are identical to traditional DSLs (declarative, domain-constrained,
+          compositional), but the concrete syntax is visual drag-and-drop or form-based.
+          The line between "language" and "tool" dissolves.</p>
+        </div>
+
+        <div class="horizon-card reveal">
+          <div class="horizon-num">05</div>
+          <span class="horizon-tag far">Long-term</span>
+          <h3>Neurally-Guided Program Synthesis</h3>
+          <p>Program synthesis research aims to automatically <em>generate</em> DSL programs
+          from examples or natural language. DeepMind's AlphaCode and OpenAI's Codex are early
+          steps. The long-term vision: a user provides examples of inputs and desired outputs,
+          and the system induces the DSL program that produces them. This inverts DSL design —
+          the language evolves to fit the discovered patterns.</p>
+        </div>
+
+        <div class="horizon-card reveal reveal-delay-1">
+          <div class="horizon-num">06</div>
+          <span class="horizon-tag far">Long-term</span>
+          <h3>Self-Modifying Domain Languages</h3>
+          <p>An active research frontier explores DSLs that can extend themselves based on
+          use patterns — observing how users push against the language's limits and automatically
+          proposing grammar extensions. Racket's macro system is a step in this direction.
+          Combined with LLMs, a DSL might iteratively suggest its own evolution to better
+          serve the domain it was designed for.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ANIMATED ORB SECTION ───────────────────────────── -->
+  <section class="section--alt section">
+    <div class="container">
+      <div class="orb-container reveal">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+        <div class="orb-label">
+          <h3>The Convergence</h3>
+          <p>DSLs, LLMs, type theory, and visual tools are converging toward a single vision:
+          letting domain experts speak to computers in the language of their domain.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PREDICTIONS TABLE ──────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <span class="label">// informed speculation</span>
+      <h2 class="mb-4">Predictions for DSL Evolution</h2>
+
+      <div style="overflow-x:auto;" class="reveal">
+        <table class="predictions">
+          <thead>
+            <tr>
+              <th>Trend</th>
+              <th>Driver</th>
+              <th>Horizon</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>SQL survives another 50 years</strong><br/><span style="font-size:0.85rem;color:var(--ink-soft);">Its declarative model is too valuable; dialects will gain new features</span></td>
+              <td class="pred-trend text-amber">LLMs lower SQL barrier; cloud databases multiply</td>
+              <td><span class="pill pill--sage">Already happening</span></td>
+              <td><div class="pred-conf"><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot filled"></div></div></td>
+            </tr>
+            <tr>
+              <td><strong>Natural language becomes a DSL front-end</strong><br/><span style="font-size:0.85rem;color:var(--ink-soft);">LLMs translate intent → precise DSL programs</span></td>
+              <td class="pred-trend text-rust">GPT-4, Copilot already doing this</td>
+              <td><span class="pill pill--sage">2024–2026</span></td>
+              <td><div class="pred-conf"><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot"></div></div></td>
+            </tr>
+            <tr>
+              <td><strong>Language Workbenches go mainstream</strong><br/><span style="font-size:0.85rem;color:var(--ink-soft);">MPS-style tools adopted outside aerospace/automotive</span></td>
+              <td class="pred-trend text-amber">GitHub Copilot + LLM-assisted DSL creation</td>
+              <td><span class="pill">2026–2030</span></td>
+              <td><div class="pred-conf"><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot"></div><div class="conf-dot"></div></div></td>
+            </tr>
+            <tr>
+              <td><strong>Dependent types enter mainstream DSLs</strong><br/><span style="font-size:0.85rem;color:var(--ink-soft);">Domain constraints encoded in types, proved at compile time</span></td>
+              <td class="pred-trend text-teal">Lean, Idris influence industry languages</td>
+              <td><span class="pill">2028–2035</span></td>
+              <td><div class="pred-conf"><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot"></div><div class="conf-dot"></div><div class="conf-dot"></div></div></td>
+            </tr>
+            <tr>
+              <td><strong>DSL proliferation via AI generation</strong><br/><span style="font-size:0.85rem;color:var(--ink-soft);">AI tools generate custom DSL grammars for niche domains</span></td>
+              <td class="pred-trend text-rust">LLM code generation + ANTLR / tree-sitter</td>
+              <td><span class="pill">2025–2030</span></td>
+              <td><div class="pred-conf"><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot filled"></div><div class="conf-dot"></div><div class="conf-dot"></div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align:center;padding:2rem 0;" class="reveal">
+    <a href="tidbits.html" class="btn btn-primary">Next: Tidbits & Curiosities →</a>
+    <a href="applications.html" class="btn btn-outline" style="margin-left:1rem;">← Applications</a>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  <script src="js/nav.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>

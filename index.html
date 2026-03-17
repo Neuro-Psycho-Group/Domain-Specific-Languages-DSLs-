@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domain Specific Languages — A Deep Exploration</title>
+  <meta name="description" content="An organised reference covering the history, applications, future directions and fascinating tidbits of Domain Specific Languages." />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <style>
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero {
+      min-height: 91vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 5rem 0 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 0%, rgba(181,74,28,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 80%, rgba(200,135,42,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 1.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: 32px;
+      height: 1px;
+      background: var(--rust);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 8vw, 6rem);
+      line-height: 1.08;
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .hero h1 span {
+      color: var(--rust);
+      font-style: italic;
+    }
+
+    .hero-sub {
+      max-width: 600px;
+      margin: 0 auto 3rem;
+      font-size: 1.15rem;
+      color: var(--ink-soft);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75em 1.75em;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.22s;
+      text-decoration: none;
+      border: 2px solid transparent;
+    }
+    .btn-primary {
+      background: var(--rust);
+      color: var(--cream);
+      border-color: var(--rust);
+    }
+    .btn-primary:hover {
+      background: var(--rust-light);
+      border-color: var(--rust-light);
+      color: var(--cream);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(181,74,28,0.25);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--rust);
+      color: var(--rust);
+      transform: translateY(-2px);
+    }
+
+    /* ── RAILROAD DIAGRAM ANIMATION ─────────────────── */
+    .railroad-section {
+      padding: 4rem 0;
+    }
+
+    .railroad-label {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 2rem;
+    }
+
+    .railroad-wrapper {
+      overflow-x: auto;
+      padding: 1rem 0 2rem;
+    }
+
+    .railroad-svg-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    #railroad-svg {
+      max-width: 900px;
+      width: 100%;
+      height: auto;
+    }
+
+    /* Railroad diagram animation */
+    .rr-line {
+      stroke: var(--border);
+      stroke-width: 2;
+      fill: none;
+    }
+    .rr-box {
+      fill: var(--cream);
+      stroke: var(--rust);
+      stroke-width: 1.5;
+      rx: 4;
+    }
+    .rr-box--alt {
+      stroke: var(--amber);
+    }
+    .rr-box--opt {
+      stroke: var(--sage);
+    }
+    .rr-text {
+      fill: var(--ink);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+    .rr-terminal {
+      fill: var(--rust-pale);
+      stroke: var(--rust);
+      stroke-width: 1.5;
+    }
+    .rr-nonterminal {
+      fill: var(--cream);
+      stroke: var(--amber);
+      stroke-width: 1.5;
+    }
+    .rr-keyword {
+      fill: #e8f0d8;
+      stroke: var(--sage);
+      stroke-width: 1.5;
+    }
+
+    /* Travelling token animation */
+    @keyframes travel {
+      0%   { offset-distance: 0%;   opacity: 0; }
+      5%   { opacity: 1; }
+      95%  { opacity: 1; }
+      100% { offset-distance: 100%; opacity: 0; }
+    }
+
+    .token-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--rust);
+      position: absolute;
+      offset-rotate: 0deg;
+      animation: travel 4s linear infinite;
+    }
+
+    /* ── WHAT IS DSL SECTION ─────────────────────────── */
+    .definition-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .definition-grid { grid-template-columns: 1fr; }
+    }
+
+    .definition-block {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--ink-mid);
+    }
+
+    .definition-block blockquote {
+      border-left: 3px solid var(--rust);
+      padding-left: 1.25rem;
+      margin: 1.5rem 0;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: var(--ink);
+    }
+
+    .dsl-vs-gpl {
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .compare-card {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .compare-card h4 {
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .compare-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .compare-card ul li {
+      font-size: 0.95rem;
+      color: var(--ink-mid);
+      padding-left: 1.1rem;
+      position: relative;
+    }
+    .compare-card ul li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--rust);
+    }
+
+    /* ── TAXONOMY DIAGRAM ────────────────────────────── */
+    .taxonomy-section { padding: 4rem 0; }
+
+    .tree-container {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      overflow-x: auto;
+    }
+
+    .tree {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 2;
+      color: var(--ink-mid);
+      white-space: pre;
+      min-width: 400px;
+    }
+
+    .tree .t-root  { color: var(--ink); font-weight: 700; }
+    .tree .t-cat   { color: var(--rust); }
+    .tree .t-item  { color: var(--amber); }
+    .tree .t-ex    { color: var(--sage); }
+
+    /* ── QUICK STATS ─────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--rust);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    /* ── NAV CARDS ───────────────────────────────────── */
+    .nav-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .nav-card {
+      display: block;
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--rust);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s var(--ease-spring);
+    }
+
+    .nav-card:hover {
+      box-shadow: 0 10px 40px var(--shadow);
+      transform: translateY(-4px);
+      border-color: var(--border);
+    }
+
+    .nav-card:hover::before { transform: scaleX(1); }
+
+    .nav-card-icon {
+      font-family: var(--font-mono);
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .nav-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+      color: var(--ink);
+    }
+
+    .nav-card p {
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    .nav-card-arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-top: 1rem;
+    }
+
+    /* ── SYNTAX PULSE ANIMATION ──────────────────────── */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(181,74,28,0.0); }
+      50%       { box-shadow: 0 0 0 8px rgba(181,74,28,0.12); }
+    }
+
+    .nav-card:hover { animation: none; }
+
+  </style>
+</head>
+<body>
+
+  <div id="nav-placeholder"></div>
+
+  <!-- ── HERO ──────────────────────────────────────────── -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="hero-eyebrow">A Complete Reference</div>
+      <h1>The Art of<br /><span>Domain Specific</span><br />Languages</h1>
+      <p class="hero-sub">
+        Languages built with singular purpose — more expressive than libraries,
+        more constrained than general-purpose tongues. Explore their history, power, and future.
+      </p>
+      <div class="hero-actions">
+        <a href="history.html" class="btn btn-primary">Begin with History →</a>
+        <a href="applications.html" class="btn btn-outline">Explore Case Studies</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── RAILROAD DIAGRAM ───────────────────────────────── -->
+  <section class="railroad-section section--alt">
+    <div class="container">
+      <div class="railroad-label">// railroad diagram — anatomy of a DSL expression</div>
+      <div class="railroad-wrapper">
+        <div class="railroad-svg-container">
+          <svg id="railroad-svg" viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg"
+               style="font-family:'JetBrains Mono',monospace; overflow:visible;">
+
+            <!-- Entry line -->
+            <line x1="20" y1="110" x2="60" y2="110" stroke="#C8BAA2" stroke-width="2"/>
+            <!-- Arrow start -->
+            <polygon points="58,106 68,110 58,114" fill="#C8BAA2"/>
+
+            <!-- KEYWORD box -->
+            <rect x="68" y="88" width="110" height="44" rx="4" fill="#e8f0d8" stroke="#5A7A5A" stroke-width="1.5"/>
+            <text x="123" y="114" text-anchor="middle" fill="#2C2416" font-size="12" font-weight="500">KEYWORD</text>
+
+            <!-- line -->
+            <line x1="178" y1="110" x2="220" y2="110" stroke="#C8BAA2" stroke-width="2"/>
+
+            <!-- IDENTIFIER box -->
+            <rect x="220" y="88" width="120" height="44" rx="4" fill="#FAF6EF" stroke="#C8872A" stroke-width="1.5"/>
+            <text x="280" y="114" text-anchor="middle" fill="#2C2416" font-size="12">IDENTIFIER</text>
+
+            <!-- fork -->
+            <line x1="340" y1="110" x2="375" y2="110" stroke="#C8BAA2" stroke-width="2"/>
+
+            <!-- optional branch indicator -->
+            <text x="375" y="86" fill="#6B5D47" font-size="10" font-style="italic">optional</text>
+
+            <!-- upper path (with OPERATOR + VALUE) -->
+            <path d="M375 110 Q395 110 395 90 L395 70" stroke="#C8BAA2" stroke-width="2" fill="none"/>
+            <line x1="395" y1="70" x2="470" y2="70" stroke="#C8BAA2" stroke-width="2"/>
+            <!-- OPERATOR -->
+            <rect x="400" y="50" width="90" height="38" rx="4" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <text x="445" y="73" text-anchor="middle" fill="#2C2416" font-size="12">OPERATOR</text>
+            <line x1="490" y1="70" x2="545" y2="70" stroke="#C8BAA2" stroke-width="2"/>
+            <!-- VALUE -->
+            <rect x="545" y="50" width="80" height="38" rx="4" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <text x="585" y="73" text-anchor="middle" fill="#2C2416" font-size="12">VALUE</text>
+            <line x1="625" y1="70" x2="680" y2="70" stroke="#C8BAA2" stroke-width="2"/>
+            <path d="M680 70 Q680 110 700 110" stroke="#C8BAA2" stroke-width="2" fill="none"/>
+
+            <!-- lower path (bypass) -->
+            <path d="M375 110 Q395 110 395 130 L395 150" stroke="#C8BAA2" stroke-width="2" fill="none"/>
+            <line x1="395" y1="150" x2="680" y2="150" stroke="#C8BAA2" stroke-width="2"/>
+            <path d="M680 150 Q680 110 700 110" stroke="#C8BAA2" stroke-width="2" fill="none"/>
+
+            <!-- rejoin line -->
+            <line x1="700" y1="110" x2="750" y2="110" stroke="#C8BAA2" stroke-width="2"/>
+
+            <!-- TERMINATOR box -->
+            <rect x="750" y="88" width="100" height="44" rx="20" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <text x="800" y="114" text-anchor="middle" fill="#2C2416" font-size="12">END</text>
+
+            <!-- Exit line -->
+            <line x1="850" y1="110" x2="840" y2="110" stroke="#C8BAA2" stroke-width="2"/>
+
+            <!-- Animated token -->
+            <circle id="token" r="6" fill="#B54A1C" opacity="0">
+              <animate attributeName="opacity" values="0;1;1;0" dur="0.5s" begin="rr-anim.begin" fill="freeze"/>
+            </circle>
+
+            <!-- Labels -->
+            <text x="20" y="104" fill="#6B5D47" font-size="10" font-style="italic">start</text>
+            <text x="830" y="104" fill="#6B5D47" font-size="10" font-style="italic">end</text>
+
+            <!-- Legend -->
+            <rect x="60" y="180" width="14" height="14" rx="2" fill="#e8f0d8" stroke="#5A7A5A" stroke-width="1.5"/>
+            <text x="80" y="192" fill="#6B5D47" font-size="10">keyword</text>
+            <rect x="170" y="180" width="14" height="14" rx="2" fill="#FAF6EF" stroke="#C8872A" stroke-width="1.5"/>
+            <text x="190" y="192" fill="#6B5D47" font-size="10">non-terminal</text>
+            <rect x="310" y="180" width="14" height="14" rx="2" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <text x="330" y="192" fill="#6B5D47" font-size="10">terminal</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Animated token path using CSS -->
+      <div style="position:relative; max-width:900px; margin:0 auto; height:0; overflow:visible;">
+        <div id="token-anim" style="
+          position:absolute;
+          top:-118px;
+          left:5%;
+          width:12px;
+          height:12px;
+          border-radius:50%;
+          background:var(--rust);
+          box-shadow:0 0 8px rgba(181,74,28,0.6);
+          opacity:0;
+          transition: left 0.4s linear, top 0.3s ease;
+        "></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── WHAT IS A DSL ──────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="definition-grid">
+        <div class="definition-block reveal">
+          <span class="label">// definition</span>
+          <h2 style="margin-bottom:1rem;">What is a<br/>Domain Specific Language?</h2>
+          <blockquote>
+            "A computer programming language of limited expressiveness focused on a particular domain."
+            <cite style="display:block;font-size:0.82rem;margin-top:0.5rem;color:var(--ink-soft);">— Martin Fowler, <em>Domain-Specific Languages</em>, 2010</cite>
+          </blockquote>
+          <p>
+            Unlike general-purpose languages (GPLs) such as Python or Java — designed to solve
+            <em>any</em> problem — a DSL is purpose-built. It speaks the vocabulary of a specific
+            problem domain: a database engineer thinks in SQL, a web designer reaches for CSS,
+            a build engineer writes Makefiles. The language <em>is</em> the domain.
+          </p>
+          <p class="mt-3">
+            DSLs trade generality for expressiveness within their domain. A few lines of SQL
+            can express a data transformation that would require hundreds of lines in a general
+            purpose language. That cognitive density is their superpower.
+          </p>
+        </div>
+
+        <div class="dsl-vs-gpl reveal reveal-delay-2">
+          <div class="compare-card">
+            <h4>
+              <span style="font-size:1.3rem;">⊞</span>
+              General-Purpose Languages
+            </h4>
+            <ul>
+              <li>Broad expressiveness across all domains</li>
+              <li>Larger learning curve to become productive</li>
+              <li>Require more code for domain-specific tasks</li>
+              <li>Ecosystem of libraries fills domain gaps</li>
+              <li>Examples: Python, Java, C++, Rust</li>
+            </ul>
+          </div>
+          <div class="compare-card" style="margin-top:1.2rem; border-left: 3px solid var(--rust);">
+            <h4>
+              <span style="font-size:1.3rem;">◈</span>
+              Domain Specific Languages
+            </h4>
+            <ul>
+              <li>Optimised expressiveness for one domain</li>
+              <li>Domain experts can often learn and use them</li>
+              <li>Extreme conciseness for in-domain tasks</li>
+              <li>Constrained — intentionally not Turing-complete</li>
+              <li>Examples: SQL, CSS, Regex, LaTeX, Terraform</li>
+            </ul>
+          </div>
+          <div class="compare-card" style="margin-top:1.2rem; background:var(--beige-dark);">
+            <h4>Two Kinds of DSL</h4>
+            <p style="font-size:0.92rem;color:var(--ink-soft);">
+              <strong>External DSLs</strong> have their own syntax and parser (SQL, CSS, Regex).<br/>
+              <strong>Internal DSLs</strong> are fluent interfaces embedded in a host language
+              (Rails routes in Ruby, Gradle in Kotlin).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STATS BAR ──────────────────────────────────────── -->
+  <section class="section--alt section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card reveal">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">DSLs documented in academic literature</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-1">
+          <div class="stat-number">1957</div>
+          <div class="stat-label">Year FORTRAN pioneered the concept</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-2">
+          <div class="stat-number">3×</div>
+          <div class="stat-label">Productivity gain reported in target domains</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-3">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Possible domains for a dedicated language</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TAXONOMY TREE ──────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <span class="label">// taxonomy</span>
+      <h2 class="mb-4">The DSL Landscape</h2>
+      <div class="tree-container reveal">
+        <div class="tree"><span class="t-root">Domain Specific Languages</span>
+├── <span class="t-cat">Data & Query</span>
+│   ├── <span class="t-item">SQL</span>        <span class="t-ex">→ relational databases since 1974</span>
+│   ├── <span class="t-item">GraphQL</span>    <span class="t-ex">→ API graph queries (Facebook, 2015)</span>
+│   └── <span class="t-item">SPARQL</span>     <span class="t-ex">→ semantic web / RDF triplestores</span>
+│
+├── <span class="t-cat">Presentation & Markup</span>
+│   ├── <span class="t-item">HTML</span>       <span class="t-ex">→ hypertext structure</span>
+│   ├── <span class="t-item">CSS</span>        <span class="t-ex">→ visual styling</span>
+│   ├── <span class="t-item">LaTeX</span>      <span class="t-ex">→ scientific typesetting</span>
+│   └── <span class="t-item">Markdown</span>   <span class="t-ex">→ lightweight markup</span>
+│
+├── <span class="t-cat">Build & Infrastructure</span>
+│   ├── <span class="t-item">Make</span>       <span class="t-ex">→ build orchestration (1976)</span>
+│   ├── <span class="t-item">Terraform</span>  <span class="t-ex">→ infrastructure-as-code (HCL)</span>
+│   └── <span class="t-item">Dockerfile</span> <span class="t-ex">→ container image definition</span>
+│
+├── <span class="t-cat">Text & Pattern</span>
+│   ├── <span class="t-item">Regex</span>      <span class="t-ex">→ pattern matching (Kleene, 1951)</span>
+│   └── <span class="t-item">ANTLR grammars</span>  <span class="t-ex">→ parser definitions</span>
+│
+├── <span class="t-cat">Configuration & Data</span>
+│   ├── <span class="t-item">YAML / TOML</span> <span class="t-ex">→ structured configuration</span>
+│   ├── <span class="t-item">JSON Schema</span> <span class="t-ex">→ data validation</span>
+│   └── <span class="t-item">Cron syntax</span> <span class="t-ex">→ task scheduling</span>
+│
+└── <span class="t-cat">Domain-Specific Science & Engineering</span>
+    ├── <span class="t-item">Modelica</span>   <span class="t-ex">→ physical system simulation</span>
+    ├── <span class="t-item">VHDL</span>       <span class="t-ex">→ hardware description</span>
+    ├── <span class="t-item">R formula</span>  <span class="t-ex">→ statistical modelling</span>
+    └── <span class="t-item">Gherkin</span>    <span class="t-ex">→ behaviour-driven development</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SITE NAV CARDS ─────────────────────────────────── -->
+  <section class="section--alt section">
+    <div class="container">
+      <span class="label">// explore the guide</span>
+      <h2 class="mb-4">Where Would You Like to Go?</h2>
+      <div class="nav-cards">
+
+        <a href="history.html" class="nav-card reveal">
+          <span class="nav-card-icon">⧖</span>
+          <h3>History</h3>
+          <p>From FORTRAN's punch cards through SQL's relational revolution to the LLM-adjacent DSLs of today. A chronological deep-dive.</p>
+          <span class="nav-card-arrow">Explore →</span>
+        </a>
+
+        <a href="applications.html" class="nav-card reveal reveal-delay-1">
+          <span class="nav-card-icon">◈</span>
+          <h3>Applications</h3>
+          <p>Detailed case studies on SQL, CSS, Regex, LaTeX, Terraform, GraphQL, and more. Real-world impact with annotated examples.</p>
+          <span class="nav-card-arrow">Explore →</span>
+        </a>
+
+        <a href="future.html" class="nav-card reveal reveal-delay-2">
+          <span class="nav-card-icon">⟡</span>
+          <h3>Future Directions</h3>
+          <p>LLM-powered natural language DSLs, low-code platforms, probabilistic programming, and where DSL design is heading.</p>
+          <span class="nav-card-arrow">Explore →</span>
+        </a>
+
+        <a href="tidbits.html" class="nav-card reveal reveal-delay-3">
+          <span class="nav-card-icon">✦</span>
+          <h3>Tidbits</h3>
+          <p>Curious facts, design paradoxes, famous mistakes, and the delightful oddities that make DSL history worth knowing.</p>
+          <span class="nav-card-arrow">Explore →</span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="js/nav.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    /* Animate the token across the railroad diagram */
+    const token = document.getElementById('token-anim');
+    const steps = [
+      { left: '5%',  top: '-118px', delay: 0 },
+      { left: '20%', top: '-118px', delay: 400 },
+      { left: '37%', top: '-118px', delay: 800 },
+      { left: '52%', top: '-140px', delay: 1200 },
+      { left: '63%', top: '-140px', delay: 1600 },
+      { left: '77%', top: '-140px', delay: 2000 },
+      { left: '87%', top: '-118px', delay: 2400 },
+      { left: '95%', top: '-118px', delay: 2800 },
+    ];
+
+    let stepIdx = 0;
+    function animateToken() {
+      if (stepIdx === 0) {
+        token.style.opacity = '1';
+        token.style.left = steps[0].left;
+        token.style.top  = steps[0].top;
+        stepIdx = 1;
+        setTimeout(animateToken, 500);
+        return;
+      }
+      if (stepIdx >= steps.length) {
+        token.style.opacity = '0';
+        stepIdx = 0;
+        setTimeout(animateToken, 1200);
+        return;
+      }
+      const s = steps[stepIdx];
+      token.style.left = s.left;
+      token.style.top  = s.top;
+      stepIdx++;
+      setTimeout(animateToken, stepIdx < steps.length ? 450 : 200);
+    }
+
+    // Only animate when railroad is visible
+    const rrSection = document.querySelector('.railroad-section');
+    const rrObserver = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setTimeout(animateToken, 600);
+        rrObserver.disconnect();
+      }
+    }, { threshold: 0.3 });
+    if (rrSection) rrObserver.observe(rrSection);
+  </script>
+</body>
+</html>

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSL Applications & Case Studies</title>
+  <meta name="description" content="In-depth case studies on SQL, CSS, Regex, LaTeX, Terraform, GraphQL, and more." />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <style>
+
+    .page-header {
+      padding: 5rem 0 3.5rem;
+      border-bottom: 1px solid var(--border-light);
+      background: radial-gradient(ellipse 60% 50% at 20% 50%, rgba(90,122,90,0.07) 0%, transparent 70%);
+    }
+
+    /* ── CASE STUDY LAYOUT ──────────────────────────── */
+    .case-study {
+      margin-bottom: 5rem;
+      padding-bottom: 5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .case-study:last-child {
+      border-bottom: none;
+    }
+
+    .case-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.5rem;
+      align-items: start;
+      margin-bottom: 2rem;
+    }
+
+    .case-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .case-desc {
+      font-size: 1.1rem;
+      line-height: 1.75;
+      color: var(--ink-mid);
+      max-width: 780px;
+      margin-bottom: 1.5rem;
+    }
+
+    .case-icon {
+      font-family: var(--font-mono);
+      font-size: 3.5rem;
+      line-height: 1;
+      opacity: 0.18;
+      color: var(--rust);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Two-column code + analysis */
+    .code-analysis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    @media (max-width: 800px) {
+      .code-analysis { grid-template-columns: 1fr; }
+      .case-header { grid-template-columns: 1fr; }
+      .case-icon { display: none; }
+    }
+
+    .analysis-panel {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+
+    .analysis-panel h4 {
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: var(--rust);
+    }
+
+    .analysis-panel ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .analysis-panel li {
+      font-size: 0.92rem;
+      color: var(--ink-mid);
+      padding-left: 1.1rem;
+      position: relative;
+      line-height: 1.6;
+    }
+    .analysis-panel li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--amber);
+      font-size: 0.8em;
+    }
+
+    /* Metrics row */
+    .metrics {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+    }
+
+    .metric {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      text-align: center;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .metric-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--rust);
+      line-height: 1;
+    }
+
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-top: 0.3rem;
+    }
+
+    /* Regex diagram */
+    .regex-diagram {
+      background: var(--ink);
+      border-radius: var(--radius);
+      padding: 2rem;
+      color: var(--beige);
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      overflow-x: auto;
+    }
+
+    .regex-parts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      align-items: stretch;
+      margin: 1rem 0;
+    }
+
+    .regex-chunk {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .regex-char {
+      font-size: 1.2rem;
+      padding: 0.4em 0.5em;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: default;
+      transition: background 0.2s;
+    }
+
+    .regex-char:hover { background: rgba(181,74,28,0.4); }
+
+    .regex-ann {
+      font-size: 0.6rem;
+      color: var(--amber-light);
+      text-align: center;
+      padding: 0.2em 0.3em;
+      max-width: 80px;
+      line-height: 1.3;
+    }
+
+    /* Animated regex match demo */
+    .regex-match-demo {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+    }
+
+    .match-string {
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+    }
+
+    .match-hl {
+      background: rgba(181,74,28,0.5);
+      border-bottom: 2px solid var(--rust-light);
+      padding: 0 1px;
+      border-radius: 2px;
+      transition: background 0.3s;
+    }
+
+    /* FSM Diagram */
+    .fsm-section {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    /* DSL anatomy callout */
+    .anatomy {
+      background: var(--beige-mid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .anatomy-code {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 2.2;
+      position: relative;
+    }
+
+    .ann {
+      position: relative;
+      cursor: help;
+    }
+
+    .ann-highlight {
+      background: var(--rust-pale);
+      border-radius: 2px;
+      padding: 0 2px;
+      border-bottom: 2px solid var(--rust);
+    }
+
+    .ann-highlight.amber { background: #F5E6C8; border-color: var(--amber); }
+    .ann-highlight.sage  { background: #D8E8D8; border-color: var(--sage); }
+    .ann-highlight.teal  { background: #C8DEDE; border-color: var(--teal); }
+
+    .ann-tooltip {
+      position: absolute;
+      bottom: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: var(--cream);
+      padding: 0.4em 0.8em;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+
+    .ann:hover .ann-tooltip { opacity: 1; }
+
+    /* Section tabs nav */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 1rem 0;
+      border-bottom: 2px solid var(--border-light);
+      margin-bottom: 3rem;
+    }
+
+    .tab-link {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      text-decoration: none;
+      padding: 0.4em 0.9em;
+      border-radius: 3px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .tab-link:hover {
+      color: var(--rust);
+      background: var(--rust-pale);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="nav-placeholder"></div>
+
+  <header class="page-header">
+    <div class="container">
+      <span class="label">// Chapter 02</span>
+      <h1>Applications &<br/><em style="color:var(--rust)">Case Studies</em></h1>
+      <p class="mt-3" style="max-width:600px;font-size:1.1rem;">
+        Seven deep dives into the world's most influential DSLs — examining their design decisions,
+        expressive power, and real-world impact.
+      </p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Jump links -->
+      <div class="tabs">
+        <a href="#sql"       class="tab-link">SQL</a>
+        <a href="#css"       class="tab-link">CSS</a>
+        <a href="#regex"     class="tab-link">Regex</a>
+        <a href="#latex"     class="tab-link">LaTeX</a>
+        <a href="#terraform" class="tab-link">Terraform</a>
+        <a href="#graphql"   class="tab-link">GraphQL</a>
+        <a href="#gherkin"   class="tab-link">Gherkin</a>
+      </div>
+
+      <!-- ── SQL ────────────────────────────────────────── -->
+      <div class="case-study reveal" id="sql">
+        <div class="case-header">
+          <div>
+            <div class="case-meta">
+              <span class="pill pill--rust">1974</span>
+              <span class="pill">Query Language</span>
+              <span class="pill">Declarative</span>
+              <span class="pill">External DSL</span>
+            </div>
+            <h2>SQL</h2>
+            <p style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-soft);">Structured Query Language</p>
+          </div>
+          <div class="case-icon">SQL</div>
+        </div>
+
+        <p class="case-desc">
+          SQL is arguably the most successful DSL ever created — and possibly the most underappreciated
+          design achievement in computing history. It takes a fundamentally hard problem (querying
+          an arbitrary relational database) and makes it expressible in sentences that non-programmers
+          can learn in an afternoon.
+        </p>
+
+        <div class="metrics">
+          <div class="metric"><div class="metric-value">50+</div><div class="metric-label">Years in production</div></div>
+          <div class="metric"><div class="metric-value">~1B</div><div class="metric-label">Instances running worldwide</div></div>
+          <div class="metric"><div class="metric-value">40+</div><div class="metric-label">Major SQL dialects</div></div>
+          <div class="metric"><div class="metric-value">#1</div><div class="metric-label">DB-Engines popularity (relational)</div></div>
+        </div>
+
+        <div class="anatomy reveal">
+          <h4 style="margin-bottom:0.75rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--rust);">// Annotated Query — hover the highlighted terms</h4>
+          <div class="anatomy-code">
+            <span class="ann"><span class="ann-highlight">SELECT</span><span class="ann-tooltip">DML verb — begin a read operation</span></span>
+            &nbsp;<span class="ann"><span class="ann-highlight amber">c.name, SUM(o.total)</span><span class="ann-tooltip">Projection — columns to return</span></span>
+            &nbsp;<span class="ann"><span class="ann-highlight sage">AS revenue</span><span class="ann-tooltip">Alias — rename the expression</span></span><br/>
+            <span class="ann"><span class="ann-highlight">FROM</span><span class="ann-tooltip">Specifies the primary relation (table)</span></span>
+            &nbsp;<span class="ann"><span class="ann-highlight amber">customers c</span><span class="ann-tooltip">Table alias for brevity</span></span><br/>
+            <span class="ann"><span class="ann-highlight teal">JOIN orders o ON c.id = o.customer_id</span><span class="ann-tooltip">Relational join — combine matching rows</span></span><br/>
+            <span class="ann"><span class="ann-highlight sage">WHERE o.created_at > '2024-01-01'</span><span class="ann-tooltip">Filter predicate — applied before grouping</span></span><br/>
+            <span class="ann"><span class="ann-highlight">GROUP BY</span><span class="ann-tooltip">Aggregation grouping key</span></span>
+            &nbsp;<span class="ann"><span class="ann-highlight amber">c.name</span><span class="ann-tooltip">Must match non-aggregate columns in SELECT</span></span><br/>
+            <span class="ann"><span class="ann-highlight teal">HAVING SUM(o.total) > 50000</span><span class="ann-tooltip">Filter applied AFTER aggregation (unlike WHERE)</span></span><br/>
+            <span class="ann"><span class="ann-highlight sage">ORDER BY revenue DESC</span><span class="ann-tooltip">Sort by alias — evaluated last</span></span>
+            &nbsp;<span class="ann"><span class="ann-highlight">LIMIT 10</span><span class="ann-tooltip">Restrict result set size</span></span>;
+          </div>
+        </div>
+
+        <div class="code-analysis">
+          <div>
+            <pre><span style="color:#E8A83E;">-- Window functions: SQL at its most expressive</span>
+SELECT
+  salesperson,
+  region,
+  quarterly_sales,
+  RANK() OVER (
+    PARTITION BY region
+    ORDER BY quarterly_sales DESC
+  ) AS regional_rank,
+  quarterly_sales / SUM(quarterly_sales) OVER (
+    PARTITION BY region
+  ) AS share_of_region
+FROM sales_data
+WHERE quarter = 'Q4-2024';</pre>
+          </div>
+          <div class="analysis-panel">
+            <h4>// Design Decisions That Made SQL Great</h4>
+            <ul>
+              <li><strong>Declarative, not procedural</strong> — you describe the result set, not the algorithm to build it. The query optimiser chooses the plan.</li>
+              <li><strong>Set-based thinking</strong> — operations act on entire relations, not row-by-row loops. This enables massive parallelism.</li>
+              <li><strong>English keywords</strong> — SELECT, FROM, WHERE, HAVING read like a specification document. Non-technical stakeholders can review queries.</li>
+              <li><strong>Composability</strong> — subqueries, CTEs, and views let complex queries be built from simpler ones.</li>
+              <li><strong>Standardisation</strong> — ANSI SQL means core queries port across databases. Dialects add power without breaking the base.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CSS ────────────────────────────────────────── -->
+      <div class="case-study reveal" id="css">
+        <div class="case-header">
+          <div>
+            <div class="case-meta">
+              <span class="pill pill--sage">1996</span>
+              <span class="pill">Styling Language</span>
+              <span class="pill">Declarative</span>
+              <span class="pill">Cascade-based</span>
+            </div>
+            <h2>CSS</h2>
+            <p style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-soft);">Cascading Style Sheets</p>
+          </div>
+          <div class="case-icon">CSS</div>
+        </div>
+
+        <p class="case-desc">
+          CSS is a study in elegant domain specificity. Its domain is visual presentation — and
+          within that domain, it does things that no general-purpose language can do as concisely.
+          A single CSS declaration can restyle thousands of elements simultaneously. The cascade,
+          specificity, and inheritance — often cited as CSS's difficulties — are actually
+          highly sophisticated solutions to a genuinely hard problem: style inheritance in a tree.
+        </p>
+
+        <div class="code-analysis">
+          <div>
+            <pre><span style="color:#E8A83E;">/* Container Queries — a DSL gaining new expressiveness */</span>
+@container article (min-width: 600px) {
+  .byline {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .byline-avatar {
+    width: 48px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+  }
+}
+
+<span style="color:#E8A83E;">/* The cascade in action */</span>
+/* Specificity: 0-1-0 */
+.card { color: navy; }
+/* Specificity: 0-2-0 — wins */
+.card.featured { color: crimson; }
+/* Specificity: 1-0-0 — always wins */
+#hero { color: goldenrod; }</pre>
+          </div>
+          <div class="analysis-panel">
+            <h4>// What Makes CSS Distinctively a DSL</h4>
+            <ul>
+              <li><strong>Selector grammar</strong> — CSS selectors are a pattern-matching DSL embedded within the styling DSL. <code>article > h2 + p::first-line</code> navigates a document tree with extreme precision.</li>
+              <li><strong>The cascade algorithm</strong> — a sophisticated resolution system for conflicting declarations, based on origin, specificity, and order. No general language implements this.</li>
+              <li><strong>Inheritance tree</strong> — properties propagate through the document hierarchy automatically, matching the semantic structure of HTML.</li>
+              <li><strong>Custom properties (variables)</strong> — introduced in 2017, these make CSS a programmable DSL — values can propagate and override down the cascade.</li>
+              <li><strong>At-rules</strong> — <code>@media</code>, <code>@keyframes</code>, <code>@supports</code>, <code>@layer</code> are sub-languages within CSS for responsiveness, animation, feature detection, and layering.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- CSS Specificity Visual -->
+        <div class="fsm-section reveal">
+          <div style="font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.1em;color:var(--ink-soft);margin-bottom:1.5rem;">// CSS Specificity — calculated as three independent counters</div>
+          <svg viewBox="0 0 640 160" style="max-width:640px;width:100%;font-family:'JetBrains Mono',monospace;" xmlns="http://www.w3.org/2000/svg">
+            <!-- Columns -->
+            <rect x="40"  y="30" width="160" height="80" rx="4" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <rect x="240" y="30" width="160" height="80" rx="4" fill="#FAF6EF" stroke="#C8872A" stroke-width="1.5"/>
+            <rect x="440" y="30" width="160" height="80" rx="4" fill="#e8f0d8" stroke="#5A7A5A" stroke-width="1.5"/>
+
+            <!-- Values -->
+            <text x="120" y="75" text-anchor="middle" font-size="32" font-weight="bold" fill="#B54A1C">A</text>
+            <text x="320" y="75" text-anchor="middle" font-size="32" font-weight="bold" fill="#C8872A">B</text>
+            <text x="520" y="75" text-anchor="middle" font-size="32" font-weight="bold" fill="#5A7A5A">C</text>
+
+            <!-- Labels -->
+            <text x="120" y="125" text-anchor="middle" font-size="10" fill="#6B5D47">ID selectors</text>
+            <text x="120" y="138" text-anchor="middle" font-size="10" fill="#6B5D47">#header</text>
+            <text x="320" y="125" text-anchor="middle" font-size="10" fill="#6B5D47">class / attr / pseudo-class</text>
+            <text x="320" y="138" text-anchor="middle" font-size="10" fill="#6B5D47">.active, [type], :hover</text>
+            <text x="520" y="125" text-anchor="middle" font-size="10" fill="#6B5D47">element / pseudo-element</text>
+            <text x="520" y="138" text-anchor="middle" font-size="10" fill="#6B5D47">div, p, ::before</text>
+
+            <!-- Separator -->
+            <text x="225" y="78" text-anchor="middle" font-size="28" fill="#C8BAA2">·</text>
+            <text x="425" y="78" text-anchor="middle" font-size="28" fill="#C8BAA2">·</text>
+
+            <!-- Example -->
+            <text x="40" y="18" font-size="10" fill="#6B5D47">#nav .active > a:hover  →  1·1·1  (beats  0·2·3)</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ── REGEX ───────────────────────────────────────── -->
+      <div class="case-study reveal" id="regex">
+        <div class="case-header">
+          <div>
+            <div class="case-meta">
+              <span class="pill pill--rust">1951 / 1986</span>
+              <span class="pill">Pattern Matching</span>
+              <span class="pill">Formal Language</span>
+            </div>
+            <h2>Regular Expressions</h2>
+            <p style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-soft);">Regex / RE — a language of patterns</p>
+          </div>
+          <div class="case-icon">.*</div>
+        </div>
+
+        <p class="case-desc">
+          Regular expressions are among the most compact DSLs ever devised — a pattern like
+          <code>^\+?[1-9]\d{1,14}$</code> expresses an entire specification (E.164 phone number format)
+          in twenty characters. They descend directly from Stephen Kleene's 1951 mathematical
+          notion of regular sets, formalised into the regex syntax we know through Ken Thompson's
+          1968 implementation in <em>ed</em>. They are perhaps the purest example of a DSL
+          rooted in formal language theory.
+        </p>
+
+        <!-- Regex breakdown diagram -->
+        <div class="regex-diagram">
+          <div style="font-size:0.7rem;letter-spacing:0.12em;opacity:0.6;margin-bottom:0.75rem;">// ANNOTATED: email validation regex</div>
+          <div class="regex-parts">
+            <div class="regex-chunk"><span class="regex-char">^</span><span class="regex-ann">start anchor</span></div>
+            <div class="regex-chunk"><span class="regex-char">[a-zA-Z0-9</span><span class="regex-ann">char class: alphanumeric</span></div>
+            <div class="regex-chunk"><span class="regex-char">._-</span><span class="regex-ann">+ literal chars</span></div>
+            <div class="regex-chunk"><span class="regex-char">]+</span><span class="regex-ann">one or more</span></div>
+            <div class="regex-chunk"><span class="regex-char">@</span><span class="regex-ann">literal @</span></div>
+            <div class="regex-chunk"><span class="regex-char">[a-zA-Z0-9</span><span class="regex-ann">char class</span></div>
+            <div class="regex-chunk"><span class="regex-char">-]+</span><span class="regex-ann">one or more</span></div>
+            <div class="regex-chunk"><span class="regex-char">(?:\.</span><span class="regex-ann">non-capture group: literal dot</span></div>
+            <div class="regex-chunk"><span class="regex-char">[a-zA-Z0-9-]+</span><span class="regex-ann">domain segment</span></div>
+            <div class="regex-chunk"><span class="regex-char">)*</span><span class="regex-ann">zero or more</span></div>
+            <div class="regex-chunk"><span class="regex-char">\.</span><span class="regex-ann">literal dot</span></div>
+            <div class="regex-chunk"><span class="regex-char">[a-zA-Z]{2,}$</span><span class="regex-ann">TLD, 2+ chars, end anchor</span></div>
+          </div>
+
+          <div class="regex-match-demo">
+            <div style="opacity:0.6;font-size:0.7rem;margin-bottom:0.5rem;">// live matches:</div>
+            <div class="match-string">
+              test@<span class="match-hl">example.com</span> &nbsp;·&nbsp;
+              <span class="match-hl">user.name+tag@sub.domain.org</span> &nbsp;·&nbsp;
+              invalid@com &nbsp;·&nbsp;
+              <span class="match-hl">hello@world.co.uk</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FSM diagram for a simple regex -->
+        <div class="fsm-section reveal">
+          <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--ink-soft);margin-bottom:1.5rem;">// Finite State Machine for regex: <code style="color:var(--rust);">ab+c</code></div>
+          <svg viewBox="0 0 640 140" style="max-width:640px;width:100%;font-family:'JetBrains Mono',monospace;" xmlns="http://www.w3.org/2000/svg">
+            <!-- States -->
+            <circle cx="70"  cy="70" r="32" fill="#FAF6EF" stroke="#C8BAA2" stroke-width="2"/>
+            <text x="70" y="75" text-anchor="middle" font-size="13" fill="#2C2416">q0</text>
+            <text x="70" y="112" text-anchor="middle" font-size="10" fill="#6B5D47">start</text>
+
+            <circle cx="230" cy="70" r="32" fill="#FAF6EF" stroke="#C8BAA2" stroke-width="2"/>
+            <text x="230" y="75" text-anchor="middle" font-size="13" fill="#2C2416">q1</text>
+            <text x="230" y="112" text-anchor="middle" font-size="10" fill="#6B5D47">saw 'a'</text>
+
+            <circle cx="400" cy="70" r="32" fill="#FAF6EF" stroke="#C8BAA2" stroke-width="2"/>
+            <text x="400" y="75" text-anchor="middle" font-size="13" fill="#2C2416">q2</text>
+            <text x="400" y="112" text-anchor="middle" font-size="10" fill="#6B5D47">saw 'b'</text>
+
+            <circle cx="570" cy="70" r="32" fill="#e8f0d8" stroke="#5A7A5A" stroke-width="2"/>
+            <circle cx="570" cy="70" r="38" fill="none" stroke="#5A7A5A" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <text x="570" y="75" text-anchor="middle" font-size="13" fill="#2C2416">q3</text>
+            <text x="570" y="112" text-anchor="middle" font-size="10" fill="#5A7A5A">accept</text>
+
+            <!-- Transitions -->
+            <!-- q0 -> q1 on 'a' -->
+            <line x1="102" y1="70" x2="198" y2="70" stroke="#C8BAA2" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="150" y="60" text-anchor="middle" font-size="12" fill="#B54A1C">a</text>
+
+            <!-- q1 -> q2 on 'b' -->
+            <line x1="262" y1="70" x2="368" y2="70" stroke="#C8BAA2" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="315" y="60" text-anchor="middle" font-size="12" fill="#B54A1C">b</text>
+
+            <!-- q2 -> q2 on 'b' (self-loop) -->
+            <path d="M390 38 Q400 10 410 38" stroke="#C8BAA2" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+            <text x="400" y="14" text-anchor="middle" font-size="12" fill="#B54A1C">b</text>
+
+            <!-- q2 -> q3 on 'c' -->
+            <line x1="432" y1="70" x2="532" y2="70" stroke="#C8BAA2" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="482" y="60" text-anchor="middle" font-size="12" fill="#B54A1C">c</text>
+
+            <!-- Arrow marker -->
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#C8BAA2"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+
+        <div class="code-analysis">
+          <div>
+            <pre><span style="color:#E8A83E;"># Named groups — regex as structured extraction</span>
+import re
+
+pattern = re.compile(r"""
+  (?P&lt;year&gt;\d{4})    # 4-digit year
+  [-/]
+  (?P&lt;month&gt;\d{1,2}) # 1–2 digit month
+  [-/]
+  (?P&lt;day&gt;\d{1,2})   # 1–2 digit day
+""", re.VERBOSE)
+
+m = pattern.search("Delivery: 2024-03-15")
+print(m.group('year'))   # '2024'
+print(m.group('month'))  # '03'</pre>
+          </div>
+          <div class="analysis-panel">
+            <h4>// The Regex DSL Paradox</h4>
+            <ul>
+              <li>Regex has <strong>write-only reputation</strong> — complex patterns become illegible even to their authors. The <code>re.VERBOSE</code> flag (shown left) adds comments to address this.</li>
+              <li>Regex is <strong>formally grounded</strong> — it corresponds exactly to the class of Regular Languages in the Chomsky hierarchy. This gives it mathematical guarantees: matching always terminates.</li>
+              <li><strong>PCRE extended it</strong> beyond formal regular expressions with lookaheads, lookbehinds, and backreferences — making it technically more powerful than "regular."</li>
+              <li>Regex is <strong>universal</strong> — supported in virtually every language, text editor, and command-line tool on earth.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LATEX ──────────────────────────────────────── -->
+      <div class="case-study reveal" id="latex">
+        <div class="case-header">
+          <div>
+            <div class="case-meta">
+              <span class="pill pill--amber">1986</span>
+              <span class="pill">Typesetting</span>
+              <span class="pill">Scientific Publishing</span>
+            </div>
+            <h2>LaTeX</h2>
+            <p style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-soft);">Lamport's TeX — the language of scientific publishing</p>
+          </div>
+          <div class="case-icon">∑∫</div>
+        </div>
+        <p class="case-desc">
+          LaTeX is the DSL that conquered academic science. The domain is scientific document
+          preparation — and within that domain, it achieves something no GUI word processor ever has:
+          mathematically perfect typesetting. A physicist can write <code>\hat{H}\psi = E\psi</code>
+          and get the Schrödinger equation rendered with typographic precision impossible in Word.
+          Over 60% of all academic papers in mathematics, physics, and computer science are written in LaTeX.
+        </p>
+        <div class="code-analysis">
+          <div>
+            <pre><span style="color:#E8A83E;">% Maxwell's Equations — expressed in LaTeX</span>
+\begin{align}
+  \nabla \cdot \vec{E}  &amp;= \frac{\rho}{\varepsilon_0} \\
+  \nabla \cdot \vec{B}  &amp;= 0 \\
+  \nabla \times \vec{E} &amp;= -\frac{\partial\vec{B}}{\partial t} \\
+  \nabla \times \vec{B} &amp;= \mu_0\!\left(\vec{J}
+    + \varepsilon_0\frac{\partial\vec{E}}{\partial t}\right)
+\end{align}</pre>
+          </div>
+          <div class="analysis-panel">
+            <h4>// LaTeX Design Philosophy</h4>
+            <ul>
+              <li><strong>Semantic markup</strong> — <code>\emph{}</code> means "emphasise," not "italicise." The style is separate from the structure, echoing HTML/CSS separation.</li>
+              <li><strong>Extensible via packages</strong> — the CTAN archive has 6,500+ packages extending LaTeX into every scientific sub-domain. Each package is itself a mini-DSL.</li>
+              <li><strong>Deterministic output</strong> — the same <code>.tex</code> source always produces identical PDF output. No GUI reflow surprises.</li>
+              <li><strong>Version-controllable</strong> — plain text source plays beautifully with git, unlike binary Word documents.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TERRAFORM ──────────────────────────────────── -->
+      <div class="case-study reveal" id="terraform">
+        <div class="case-header">
+          <div>
+            <div class="case-meta">
+              <span class="pill pill--teal">2014</span>
+              <span class="pill">Infrastructure as Code</span>
+              <span class="pill">Declarative</span>
+              <span class="pill">HCL</span>
+            </div>
+            <h2>Terraform / HCL</h2>
+            <p style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-soft);">HashiCorp Configuration Language — infrastructure made declarative</p>
+          </div>
+          <div class="case-icon">⛅</div>
+        </div>
+        <p class="case-desc">
+          Terraform's HCL is a masterclass in applying DSL thinking to infrastructure provisioning.
+          Before Terraform, provisioning cloud resources meant imperative scripts — create this server,
+          then configure this network, then attach this disk, handle the errors. HCL flips this:
+          you declare the desired state, Terraform computes the diff against reality, and executes only
+          what's needed. This mirrors SQL's declarative brilliance applied to a new domain.
+        </p>
+        <div class="code-analysis">
+          <div>
+            <pre><span style="color:#E8A83E;"># Terraform HCL — declare desired state, not steps</span>
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = var.instance_type
+
+  vpc_security_group_ids = [
+    aws_security_group.allow_http.id
+  ]
+
+  tags = merge(local.common_tags, {
+    Name = "web-${var.environment}"
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+output "public_ip" {
+  value       = aws_instance.web.public_ip
+  description = "The public IP of the web server"
+}</pre>
+          </div>
+          <div class="analysis-panel">
+            <h4>// HCL's Key DSL Decisions</h4>
+            <ul>
+              <li><strong>Resource graph</strong> — HCL builds an implicit dependency graph from references. <code>aws_security_group.allow_http.id</code> tells Terraform to create the SG first. No explicit ordering needed.</li>
+              <li><strong>Idempotent by design</strong> — running Terraform twice produces no changes the second time. The plan is always computed from current state.</li>
+              <li><strong>Interpolation expressions</strong> — string interpolation, function calls, and conditionals give HCL expressiveness without becoming a general programming language.</li>
+              <li><strong>Providers as DSL extensions</strong> — each cloud provider's Terraform provider is a DSL vocabulary extension, adding its resource types to HCL's grammar.</li>
+              <li><strong>State separation</strong> — state is stored externally; the HCL source is purely declarative.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── GRAPHQL ─────────────────────────────────────── -->
+      <div class="case-study reveal" id="graphql">
+        <div class="case-header">
+          <div>
+            <div class="case-meta">
+              <span class="pill pill--teal">2015</span>
+              <span class="pill">API Query</span>
+              <span class="pill">Type System</span>
+              <span class="pill">Facebook</span>
+            </div>
+            <h2>GraphQL</h2>
+            <p style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-soft);">A query language for your API — typed, introspectable, composable</p>
+          </div>
+          <div class="case-icon">⬡</div>
+        </div>
+        <p class="case-desc">
+          GraphQL solves a specific, painful domain problem: clients over-fetching or under-fetching
+          data from REST APIs. Facebook engineers in 2012 were struggling to power the mobile
+          News Feed efficiently — too many REST calls, too much wasted bandwidth. GraphQL lets
+          clients describe the exact shape of data they need, and the server returns exactly that.
+          Its schema is itself a DSL — the Schema Definition Language (SDL) — that both documents
+          and enforces the API contract.
+        </p>
+        <div class="code-analysis">
+          <div>
+            <pre><span style="color:#E8A83E;"># GraphQL SDL — the schema DSL within the query DSL</span>
+type Article {
+  id: ID!
+  title: String!
+  author: User!
+  tags: [Tag!]!
+  body: String!
+  publishedAt: DateTime
+  comments(limit: Int = 10): [Comment!]!
+}
+
+type Query {
+  article(id: ID!): Article
+  articles(
+    filter: ArticleFilter
+    orderBy: ArticleOrderBy
+    first: Int
+    after: String
+  ): ArticleConnection!
+}
+
+<span style="color:#E8A83E;"># Client query mirrors the response shape exactly</span>
+query FeaturedArticle($id: ID!) {
+  article(id: $id) {
+    title
+    author { name avatar { url } }
+    tags { name slug }
+    comments(limit: 3) { body author { name } }
+  }
+}</pre>
+          </div>
+          <div class="analysis-panel">
+            <h4>// GraphQL's DSL Innovations</h4>
+            <ul>
+              <li><strong>Hierarchical queries</strong> — query shape mirrors response shape. The client holds the pen: no more over-fetching.</li>
+              <li><strong>Introspection</strong> — GraphQL APIs can be queried about themselves. IDEs and tools can auto-complete based on the live schema.</li>
+              <li><strong>Fragments</strong> — reusable query pieces that enable composition. Define once, spread anywhere.</li>
+              <li><strong>Subscriptions</strong> — the query language extends to real-time: <code>subscription { messageAdded { text } }</code>.</li>
+              <li><strong>Strong typing</strong> — every field has a declared type. The DSL is its own contract between client and server.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── GHERKIN ─────────────────────────────────────── -->
+      <div class="case-study reveal" id="gherkin">
+        <div class="case-header">
+          <div>
+            <div class="case-meta">
+              <span class="pill pill--sage">2008</span>
+              <span class="pill">BDD</span>
+              <span class="pill">Human-readable Tests</span>
+            </div>
+            <h2>Gherkin</h2>
+            <p style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-soft);">Behaviour-Driven Development — tests as readable specifications</p>
+          </div>
+          <div class="case-icon">🥒</div>
+        </div>
+        <p class="case-desc">
+          Gherkin (used by Cucumber, Behave, and SpecFlow) is a DSL designed for a uniquely
+          social purpose: writing automated tests that non-technical stakeholders can read and
+          verify. Its domain is <em>behavioural specification</em>. A product owner, a tester,
+          and a developer can all meaningfully engage with a Gherkin specification — which makes
+          it one of the few DSLs designed as much for human collaboration as for machine execution.
+        </p>
+        <div class="code-analysis">
+          <div>
+            <pre><span style="color:#E8A83E;"># Gherkin — tests that product owners can read</span>
+Feature: User Account Deposits
+
+  Background:
+    Given a user "alice@example.com" exists
+    And their account balance is £0.00
+
+  Scenario: Successful deposit
+    When alice deposits £50.00
+    Then her account balance should be £50.00
+    And she should receive a confirmation email
+
+  Scenario Outline: Deposit limits
+    When alice attempts to deposit &lt;amount&gt;
+    Then the result should be &lt;outcome&gt;
+
+    Examples:
+      | amount   | outcome  |
+      | £10.00   | success  |
+      | £0.00    | rejected |
+      | £10001   | rejected |</pre>
+          </div>
+          <div class="analysis-panel">
+            <h4>// Gherkin as a Social DSL</h4>
+            <ul>
+              <li><strong>Given-When-Then</strong> — the three keywords map directly to precondition, action, and postcondition — the universal structure of any test case, in plain English.</li>
+              <li><strong>Scenario Outlines</strong> — parameterised scenarios from tables. Data-driven tests that non-developers can extend.</li>
+              <li><strong>Ubiquitous Language</strong> — Gherkin enforces Eric Evans' DDD concept of a shared vocabulary between technical and non-technical team members.</li>
+              <li><strong>Living documentation</strong> — passing Gherkin tests are proof that the system matches the specification. The tests <em>are</em> the documentation.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div style="text-align:center;padding:2rem 0;" class="reveal">
+    <a href="future.html" class="btn btn-primary">Next: Future Directions →</a>
+    <a href="history.html" class="btn btn-outline" style="margin-left:1rem;">← History</a>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  <script src="js/nav.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>

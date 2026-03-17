@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSL Tidbits — Curiosities & Fun Facts</title>
+  <meta name="description" content="Curious facts, design paradoxes, and delightful oddities from the world of Domain Specific Languages." />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <style>
+
+    .page-header {
+      padding: 5rem 0 3.5rem;
+      border-bottom: 1px solid var(--border-light);
+      background: radial-gradient(ellipse 70% 60% at 30% 70%, rgba(200,135,42,0.08) 0%, transparent 70%);
+    }
+
+    /* ── TIDBIT CARDS ─────────────────────────────────── */
+    .tidbits-masonry {
+      columns: 2;
+      column-gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    @media (max-width: 700px) {
+      .tidbits-masonry { columns: 1; }
+    }
+
+    .tidbit {
+      break-inside: avoid;
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tidbit::before {
+      content: var(--icon, '"');
+      position: absolute;
+      top: -0.5rem;
+      right: 1rem;
+      font-size: 5rem;
+      opacity: 0.05;
+      font-family: var(--font-display);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .tidbit-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 0.5rem;
+    }
+
+    .tidbit h3 {
+      font-size: 1.05rem;
+      margin-bottom: 0.6rem;
+      line-height: 1.35;
+    }
+
+    .tidbit p {
+      font-size: 0.92rem;
+      color: var(--ink-mid);
+      line-height: 1.7;
+    }
+
+    .tidbit-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      padding: 0.15em 0.6em;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--ink-soft);
+      margin-bottom: 0.6rem;
+    }
+
+    /* ── DESIGN PARADOXES ────────────────────────────── */
+    .paradox-grid {
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .paradox-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.5rem;
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      align-items: start;
+    }
+
+    .paradox-icon {
+      font-size: 2rem;
+      line-height: 1;
+      opacity: 0.7;
+    }
+
+    .paradox-item h4 {
+      margin-bottom: 0.4rem;
+      font-size: 1rem;
+    }
+
+    .paradox-item p {
+      font-size: 0.9rem;
+      color: var(--ink-mid);
+      line-height: 1.65;
+    }
+
+    /* ── FAMOUS BUGS ─────────────────────────────────── */
+    .bugs-section {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 4rem 0;
+      margin: 3rem 0;
+    }
+
+    .bugs-section h2, .bugs-section h3 { color: var(--cream); }
+    .bugs-section p { color: var(--parchment); }
+    .bugs-section .label { color: var(--amber-light); }
+
+    .bug-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .bug-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(200,186,162,0.15);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      border-top: 3px solid var(--rust);
+    }
+
+    .bug-card.amber { border-top-color: var(--amber); }
+    .bug-card.teal  { border-top-color: var(--teal); }
+
+    .bug-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--cream);
+    }
+
+    .bug-card p { font-size: 0.88rem; line-height: 1.7; }
+
+    /* ── QUIZ / INTERACTIVE ──────────────────────────── */
+    .quiz-section {
+      background: var(--beige-mid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      margin: 3rem 0;
+    }
+
+    .quiz-question {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--rust);
+      background: var(--rust-pale);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--sage);
+      background: #D8E8D8;
+      color: #2A5A2A;
+    }
+
+    .quiz-option.wrong {
+      border-color: var(--rust);
+      background: var(--rust-pale);
+      color: #6B1C00;
+    }
+
+    .quiz-letter {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--beige-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      letter-spacing: 0;
+    }
+
+    .quiz-result {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      display: none;
+    }
+
+    .quiz-result.show { display: block; }
+    .quiz-result.correct { background: #D8E8D8; color: #2A5A2A; border: 1px solid var(--sage); }
+    .quiz-result.wrong   { background: var(--rust-pale); color: #6B1C00; border: 1px solid var(--rust); }
+
+    /* ── LANGUAGE FAMILY TREE ────────────────────────── */
+    .etymology-section {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+
+    /* ── GLOSSARY ─────────────────────────────────────── */
+    .glossary {
+      display: grid;
+      gap: 0;
+    }
+
+    .glossary-entry {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 1.5rem;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border-light);
+      align-items: baseline;
+    }
+
+    .glossary-entry:last-child { border-bottom: none; }
+
+    .glossary-term {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--rust);
+    }
+
+    .glossary-def {
+      font-size: 0.92rem;
+      color: var(--ink-mid);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 600px) {
+      .glossary-entry { grid-template-columns: 1fr; gap: 0.4rem; }
+      .paradox-item { grid-template-columns: 1fr; }
+      .paradox-icon { display: none; }
+    }
+
+    /* Animated counter */
+    @keyframes count-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fun-number {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--rust);
+      line-height: 1;
+      animation: count-up 0.5s ease forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="nav-placeholder"></div>
+
+  <header class="page-header">
+    <div class="container">
+      <span class="label">// Chapter 04</span>
+      <h1>Tidbits &<br/><em style="color:var(--rust)">Curiosities</em></h1>
+      <p class="mt-3" style="max-width:600px;font-size:1.1rem;">
+        The delightful, paradoxical, surprising, and occasionally embarrassing corners
+        of domain specific language history.
+      </p>
+    </div>
+  </header>
+
+  <!-- ── MAIN TIDBITS ───────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="divider"><span class="divider-icon">// fascinating facts</span></div>
+
+      <div class="tidbits-masonry">
+
+        <div class="tidbit reveal" style="--icon:'1'">
+          <div class="tidbit-num">// 001</div>
+          <span class="tidbit-tag">SQL</span>
+          <h3>SQL Was Almost Called SEQUEL</h3>
+          <p>
+            IBM's original name was SEQUEL — Structured English Query Language. They had to rename it
+            to SQL because a British aircraft manufacturer, Hawker Siddeley, already held the trademark
+            on "SEQUEL." The name change is why old-timers still pronounce it "SEE-kwel" rather than
+            "ess-cue-ell." Both pronunciations are technically correct; SQL has no official pronunciation.
+          </p>
+        </div>
+
+        <div class="tidbit reveal reveal-delay-1" style="--icon:'2'">
+          <div class="tidbit-num">// 002</div>
+          <span class="tidbit-tag">COBOL</span>
+          <h3>COBOL Processes More Money Daily Than the Entire Web</h3>
+          <p>
+            An estimated 95 billion lines of COBOL code are still running today. The US Federal Reserve
+            processes $3 trillion in daily transactions through COBOL systems. According to Reuters, 95%
+            of ATM swipes and 80% of in-person transactions touch COBOL code. Despite being declared
+            "dead" dozens of times, COBOL is processing more transactions than ever.
+          </p>
+        </div>
+
+        <div class="tidbit reveal" style="--icon:'3'">
+          <div class="tidbit-num">// 003</div>
+          <span class="tidbit-tag">Regex</span>
+          <h3>The Catastrophic Backtracking Problem</h3>
+          <p>
+            In 2016, a single regex caused a 27-minute global outage at Cloudflare. The pattern
+            <code>(?:(?:\"|'|\]|\}|\\|\d|(?:nan|infinity|true|false|null|undefined|symbol|math)|\`|-|\+)+[)]*;?((?:\s|-|~|!|{}|\|\||\+)*.*(?:.*=.*)))</code>
+            triggered catastrophic backtracking on certain inputs — the engine had to explore an
+            exponentially large number of possible match paths. This is a known hazard of regex engines
+            that use backtracking rather than NFA simulation.
+          </p>
+        </div>
+
+        <div class="tidbit reveal reveal-delay-2" style="--icon:'4'">
+          <div class="tidbit-num">// 004</div>
+          <span class="tidbit-tag">CSS</span>
+          <h3>CSS Was Originally Proposed by Two People Simultaneously</h3>
+          <p>
+            Håkon Wium Lie proposed CSS in October 1994. Bert Bos was simultaneously developing a
+            similar language called "Stream-based Style Sheet Proposal." They joined forces at CERN
+            to merge their ideas. There was fierce early competition from JavaScript Style Sheets (JSSS),
+            DSSSL, and others. The W3C chose CSS partly for its simplicity. Early browsers like Internet
+            Explorer 3 implemented only parts of CSS 1 — incorrectly — leading to the browser wars
+            of the late 1990s.
+          </p>
+        </div>
+
+        <div class="tidbit reveal reveal-delay-1" style="--icon:'5'">
+          <div class="tidbit-num">// 005</div>
+          <span class="tidbit-tag">Make</span>
+          <h3>Make Was Written in a Weekend. The Tab Bug Lives Forever.</h3>
+          <p>
+            Stuart Feldman wrote the original Make in one weekend in 1976. The infamous requirement
+            that Makefile recipes must be indented with a <em>tab</em> character (not spaces) was a
+            known bug from day one — Feldman himself called it a mistake. But Make was already in use
+            by the time he caught it, so fixing it would break existing files. The tab requirement
+            has caused developer pain for nearly 50 years.
+          </p>
+        </div>
+
+        <div class="tidbit reveal" style="--icon:'6'">
+          <div class="tidbit-num">// 006</div>
+          <span class="tidbit-tag">LaTeX</span>
+          <h3>Knuth Paid $2.56 for Each Bug in TeX</h3>
+          <p>
+            Donald Knuth offered reward cheques for bugs found in TeX, starting at $2.56 (2^8 cents)
+            and doubling with each major version. The cheques became so famous as collector's items
+            that few recipients ever cash them. The current reward is $327.68. TeX's version numbers
+            converge asymptotically to π (currently 3.14159265…); METAFONT converges to e.
+          </p>
+        </div>
+
+        <div class="tidbit reveal reveal-delay-2" style="--icon:'7'">
+          <div class="tidbit-num">// 007</div>
+          <span class="tidbit-tag">SQL</span>
+          <h3>NULL: The Billion-Dollar Mistake in a DSL</h3>
+          <p>
+            Tony Hoare — inventor of NULL in programming — called it "my billion-dollar mistake."
+            SQL's NULL has particularly tortured semantics: NULL ≠ NULL (because "unknown" ≠ "unknown"),
+            NULL compared to anything returns NULL (not FALSE), and <code>NOT IN</code> clauses silently
+            return no rows if any value in the list is NULL. SQL developers have been bitten by NULL
+            semantics for fifty years.
+          </p>
+          <pre style="margin-top:1rem;font-size:0.72rem;"><span style="color:#E8A83E;">-- Counterintuitive: returns 0 rows when ids contains NULL!</span>
+SELECT * FROM users
+WHERE id NOT IN (SELECT id FROM banned_users);</pre>
+        </div>
+
+        <div class="tidbit reveal reveal-delay-3" style="--icon:'8'">
+          <div class="tidbit-num">// 008</div>
+          <span class="tidbit-tag">FORTRAN</span>
+          <h3>The Hypen That Nearly Crashed a Rocket</h3>
+          <p>
+            In 1962, NASA's Mariner 1 rocket was destroyed 294 seconds after launch. The cause:
+            a missing overbar notation (effectively a hyphen) in a handwritten FORTRAN specification
+            that was incorrectly transcribed into code. The omission caused the control program to
+            interpret normal velocity fluctuations as errors, issuing incorrect steering commands.
+            Arthur C. Clarke called it "the most expensive hyphen in history."
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DESIGN PARADOXES ──────────────────────────────── -->
+  <section class="section--alt section">
+    <div class="container">
+      <span class="label">// design paradoxes</span>
+      <h2 class="mb-4">The Paradoxes of DSL Design</h2>
+      <div class="paradox-grid">
+
+        <div class="paradox-item reveal">
+          <div class="paradox-icon">⚖️</div>
+          <div>
+            <h4>The Expressiveness–Analysability Trade-off</h4>
+            <p>The more expressive a DSL becomes, the harder it is to analyse, optimise, or statically
+            verify. SQL is highly optimisable <em>because</em> it's not Turing-complete — the query
+            optimiser can reason about all possible execution plans. Add Turing-completeness (stored
+            procedures, triggers) and optimisability collapses. This is why general-purpose languages
+            can't be optimised as aggressively as DSLs.</p>
+          </div>
+        </div>
+
+        <div class="paradox-item reveal">
+          <div class="paradox-icon">🔄</div>
+          <div>
+            <h4>The Greenspun's Tenth Rule</h4>
+            <p>Philip Greenspun observed: <em>"Any sufficiently complicated C or Fortran program contains
+            an ad hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp."</em>
+            The corollary for DSLs: any sufficiently powerful DSL eventually grows general-purpose
+            features (stored procedures in SQL, JavaScript in CSS, scripting in Make) — undermining
+            the very constraints that made it analysable.</p>
+          </div>
+        </div>
+
+        <div class="paradox-item reveal">
+          <div class="paradox-icon">🎯</div>
+          <div>
+            <h4>The Learnability Paradox</h4>
+            <p>DSLs are supposed to be easier than general-purpose languages for domain experts.
+            Yet the most powerful DSLs — SQL, Regex, LaTeX — have extremely steep mastery curves.
+            A domain expert can learn basic SQL in an hour; becoming fluent in window functions,
+            CTEs, and query optimisation takes years. The simplicity of entry masks the depth of
+            mastery required.</p>
+          </div>
+        </div>
+
+        <div class="paradox-item reveal">
+          <div class="paradox-icon">🧬</div>
+          <div>
+            <h4>The Vocabulary Proliferation Problem</h4>
+            <p>Every organisation with specific domain needs tends to create its own DSL —
+            or extend an existing one with proprietary constructs. The result: dozens of
+            incompatible SQL dialects, hundreds of CSS preprocessors (SASS, LESS, Stylus, PostCSS),
+            and configuration formats beyond counting (YAML, TOML, HCL, INI, JSON, HOCON…).
+            DSLs solve the expressiveness problem and create an ecosystem fragmentation problem.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAMOUS DSL BUGS ────────────────────────────────── -->
+  <section class="bugs-section">
+    <div class="container">
+      <span class="label">// hall of infamy</span>
+      <h2>Famous DSL Bugs & Misfeatures</h2>
+      <p class="mt-3" style="max-width:600px;">
+        Even the most carefully designed domain languages carry unexpected costs.
+      </p>
+      <div class="bug-cards">
+        <div class="bug-card">
+          <h3>CSS <code>float</code> — The Layout Hack That Became Standard</h3>
+          <p>CSS <code>float</code> was designed for wrapping text around images (like magazine layout).
+          For over a decade, web developers used it as the primary mechanism for multi-column layouts —
+          a purpose it was never designed for, causing endless "clearfix" hacks. It took until Flexbox
+          (2012) and Grid (2017) for CSS to have proper layout primitives.</p>
+        </div>
+        <div class="bug-card amber">
+          <h3>SQL's <code>GROUP BY</code> — Not What You Think</h3>
+          <p>Many developers misunderstand SQL's execution order: <code>GROUP BY</code> executes
+          before <code>HAVING</code>, which executes before <code>SELECT</code> aliases.
+          This means you cannot use a SELECT alias in a WHERE clause, but you can in ORDER BY —
+          an inconsistency that has confused developers for fifty years and varies across database systems.</p>
+        </div>
+        <div class="bug-card teal">
+          <h3>YAML's "Norway Problem"</h3>
+          <p>YAML's implicit type coercion is notorious. The ISO country code for Norway is "NO."
+          In YAML 1.1, bare <code>NO</code> is interpreted as boolean <code>false</code>. So a
+          configuration file listing countries including Norway would silently turn Norway into
+          <code>false</code>. YAML 1.2 fixed this, but countless systems still use 1.1 parsers.</p>
+          <pre style="margin-top:0.75rem;font-size:0.72rem;background:rgba(0,0,0,0.3);">countries: [GB, DE, NO, FR]
+<span style="color:#E8A83E;"># YAML 1.1 parses NO as: false</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── INTERACTIVE QUIZ ───────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <span class="label">// test your knowledge</span>
+      <h2 class="mb-4">DSL Trivia</h2>
+
+      <div class="quiz-section reveal" id="quiz-1">
+        <div class="quiz-question">Which DSL's version numbers converge to π (pi)?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answer(this, false, 'quiz-1')">
+            <span class="quiz-letter">A</span>
+            FORTRAN — each version adds one decimal place of π
+          </div>
+          <div class="quiz-option" onclick="answer(this, false, 'quiz-1')">
+            <span class="quiz-letter">B</span>
+            SQL — named after E. F. Codd's fondness for mathematics
+          </div>
+          <div class="quiz-option" onclick="answer(this, true, 'quiz-1')">
+            <span class="quiz-letter">C</span>
+            TeX — Donald Knuth's typesetting language
+          </div>
+          <div class="quiz-option" onclick="answer(this, false, 'quiz-1')">
+            <span class="quiz-letter">D</span>
+            Python — inspired by Guido's love of mathematics
+          </div>
+        </div>
+        <div class="quiz-result correct" id="quiz-1-correct">
+          ✓ Correct! TeX versions converge to π (currently 3.14159265…). METAFONT converges to e.
+          Knuth decreed that on his death, the versions will be finalised at their current values.
+        </div>
+        <div class="quiz-result wrong" id="quiz-1-wrong">
+          ✗ Not quite. TeX — Donald Knuth's typesetting language — has versions that converge to π.
+          Currently at 3.14159265…
+        </div>
+      </div>
+
+      <div class="quiz-section reveal" id="quiz-2" style="margin-top:1.5rem;">
+        <div class="quiz-question">What was the original name of SQL?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answer(this, false, 'quiz-2')">
+            <span class="quiz-letter">A</span>
+            QUEL — Query Language
+          </div>
+          <div class="quiz-option" onclick="answer(this, true, 'quiz-2')">
+            <span class="quiz-letter">B</span>
+            SEQUEL — Structured English Query Language
+          </div>
+          <div class="quiz-option" onclick="answer(this, false, 'quiz-2')">
+            <span class="quiz-letter">C</span>
+            SQUEL — Simple Query Language for English Users
+          </div>
+          <div class="quiz-option" onclick="answer(this, false, 'quiz-2')">
+            <span class="quiz-letter">D</span>
+            QBE — Query By Example
+          </div>
+        </div>
+        <div class="quiz-result correct" id="quiz-2-correct">
+          ✓ Correct! IBM's original name was SEQUEL (Structured English Query Language). It was
+          renamed to SQL due to a trademark conflict with Hawker Siddeley.
+        </div>
+        <div class="quiz-result wrong" id="quiz-2-wrong">
+          ✗ The original name was SEQUEL — Structured English Query Language. It was renamed due to
+          a trademark held by Hawker Siddeley, a British aircraft company.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── GLOSSARY ────────────────────────────────────────── -->
+  <section class="section--alt section">
+    <div class="container">
+      <span class="label">// reference</span>
+      <h2 class="mb-4">DSL Glossary</h2>
+      <div class="glossary reveal">
+
+        <div class="glossary-entry">
+          <span class="glossary-term">Abstract Syntax Tree</span>
+          <span class="glossary-def">The tree data structure produced by parsing a DSL program. Represents the hierarchical structure of the program's grammar, stripping away whitespace and punctuation. The AST is the primary data structure for DSL analysis, transformation, and compilation.</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">BNF / EBNF</span>
+          <span class="glossary-def">Backus-Naur Form (and Extended BNF) — the metalanguage used to formally specify DSL grammars. Invented by John Backus to describe ALGOL 60. Nearly every formal DSL specification uses BNF or a derivative (ANTLR grammars, PEG, railroad diagrams).</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">Chomsky Hierarchy</span>
+          <span class="glossary-def">A classification of formal grammars by expressive power: Regular (regex, FSMs) < Context-Free (most programming languages, parsed by PDAs) < Context-Sensitive < Recursively Enumerable (Turing machines). Most DSLs are context-free or simpler.</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">Declarative DSL</span>
+          <span class="glossary-def">A DSL where programs describe <em>what</em> is desired, not <em>how</em> to achieve it. SQL, CSS, HTML, and Terraform are declarative. The underlying system (query optimiser, browser, provisioner) determines the execution strategy.</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">External DSL</span>
+          <span class="glossary-def">A DSL with its own distinct syntax, parser, and toolchain — independent of any host language. SQL, CSS, Regex, and LaTeX are external DSLs. Require more implementation effort but can have cleaner, purpose-designed syntax.</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">Fluent Interface</span>
+          <span class="glossary-def">An internal DSL pattern where method calls are chained to read like natural language: <code>query.select("name").from("users").where("age > 18").orderBy("name")</code>. Popularised by Martin Fowler. jQuery is the canonical example.</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">Internal DSL</span>
+          <span class="glossary-def">A DSL built within a host general-purpose language using the host's syntax. Rails routes in Ruby, Gradle build files in Kotlin, and RSpec tests in Ruby are internal DSLs. Leverages host language tooling but is constrained by its syntax.</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">Language Workbench</span>
+          <span class="glossary-def">A tool for building DSLs rapidly — providing grammar editing, IDE generation, and debugging support. JetBrains MPS, Xtext, and Spoofax are language workbenches. They lower the cost of DSL creation from months to days.</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">PEG Grammar</span>
+          <span class="glossary-def">Parsing Expression Grammar — an alternative to BNF that describes grammars procedurally rather than generatively. PEGs are deterministic (no ambiguity), making them popular for DSL parsers. Used by tools like LPEG, Pest (Rust), and pest.rs.</span>
+        </div>
+
+        <div class="glossary-entry">
+          <span class="glossary-term">Semantic Gap</span>
+          <span class="glossary-def">The distance between the concepts in a problem domain and the concepts available in a programming language. DSLs exist to reduce this gap — making it possible to express domain concepts directly without translation to lower-level abstractions.</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align:center;padding:2rem 0;" class="reveal">
+    <a href="index.html" class="btn btn-primary">← Back to Overview</a>
+    <a href="future.html" class="btn btn-outline" style="margin-left:1rem;">← Future Directions</a>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  <script src="js/nav.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    function answer(el, correct, quizId) {
+      // Prevent re-answering
+      const quiz = document.getElementById(quizId);
+      if (quiz.querySelector('.correct, .wrong')) return;
+
+      el.classList.add(correct ? 'correct' : 'wrong');
+
+      const correctDiv = document.getElementById(quizId + '-correct');
+      const wrongDiv = document.getElementById(quizId + '-wrong');
+
+      if (correct) {
+        correctDiv.classList.add('show');
+      } else {
+        wrongDiv.classList.add('show');
+        // Highlight the correct answer
+        const options = quiz.querySelectorAll('.quiz-option');
+        // Find the correct one and highlight
+        options.forEach(opt => {
+          if (opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>

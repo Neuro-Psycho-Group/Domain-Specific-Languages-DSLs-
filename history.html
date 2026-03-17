@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>History of Domain Specific Languages</title>
+  <meta name="description" content="A chronological history of domain specific languages from 1950s FORTRAN through to modern cloud-native DSLs." />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <style>
+
+    /* ── PAGE HEADER ─────────────────────────────────── */
+    .page-header {
+      padding: 5rem 0 3.5rem;
+      border-bottom: 1px solid var(--border-light);
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 20%, rgba(200,135,42,0.07) 0%, transparent 70%);
+    }
+
+    .page-header-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: end;
+    }
+
+    .page-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--ink-soft);
+    }
+
+    /* ── TIMELINE ────────────────────────────────────── */
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom,
+        var(--rust) 0%,
+        var(--amber) 40%,
+        var(--sage) 70%,
+        var(--teal) 100%
+      );
+    }
+
+    .era {
+      margin-bottom: 4rem;
+    }
+
+    .era-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .era-header::before {
+      content: '';
+      position: absolute;
+      left: -2.5rem;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 3px solid var(--rust);
+      box-shadow: 0 0 0 4px var(--beige);
+    }
+
+    .era-header.amber::before { border-color: var(--amber); }
+    .era-header.sage::before  { border-color: var(--sage); }
+    .era-header.teal::before  { border-color: var(--teal); }
+
+    .era-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: var(--rust);
+      background: var(--rust-pale);
+      padding: 0.25em 0.75em;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .era-date.amber { color: var(--amber); background: #F5E6C8; }
+    .era-date.sage  { color: var(--sage);  background: #D8E8D8; }
+    .era-date.teal  { color: var(--teal);  background: #C8DEDE; }
+
+    .era-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .events {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .event-card {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+    }
+
+    .event-year {
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: var(--parchment);
+      line-height: 1;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      letter-spacing: 0.05em;
+      border-right: 1px solid var(--border-light);
+      padding-right: 1rem;
+      align-self: start;
+    }
+
+    .event-body h4 {
+      font-size: 1.05rem;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .event-body p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-mid);
+    }
+
+    .event-body pre {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+    }
+
+    /* ── SYNTAX TREE DIAGRAM ────────────────────────── */
+    .parse-tree-section {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      margin: 3rem 0;
+      text-align: center;
+    }
+
+    .parse-tree-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 2rem;
+    }
+
+    /* CSS parse tree */
+    .ptree {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .pt-node {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      padding: 0.4em 0.9em;
+      border-radius: 3px;
+      background: var(--cream);
+      border: 1.5px solid var(--rust);
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .pt-node--terminal {
+      background: var(--rust-pale);
+      border-color: var(--rust);
+      font-size: 0.72rem;
+    }
+
+    .pt-node--nonterminal {
+      background: var(--cream);
+      border-color: var(--amber);
+    }
+
+    .pt-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .pt-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .pt-edge {
+      width: 2px;
+      height: 30px;
+      background: var(--border);
+      margin: 0 auto;
+    }
+
+    .pt-hline {
+      height: 2px;
+      background: var(--border);
+      position: absolute;
+      top: 0;
+    }
+
+    /* Animated highlight on tree nodes */
+    @keyframes node-pulse {
+      0%, 100% { background: var(--cream); }
+      50%       { background: var(--rust-pale); }
+    }
+
+    .parse-tree-section:hover .pt-node {
+      animation: node-pulse 2s ease infinite;
+      animation-delay: calc(var(--i, 0) * 0.2s);
+    }
+
+    /* ── INFLUENCE MAP ───────────────────────────────── */
+    .influence-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .influence-card {
+      background: var(--cream);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      border-top: 3px solid var(--rust);
+    }
+
+    .influence-card.amber { border-top-color: var(--amber); }
+    .influence-card.sage  { border-top-color: var(--sage); }
+    .influence-card.teal  { border-top-color: var(--teal); }
+
+    .influence-name {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+
+    .influence-year {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--ink-soft);
+      margin-bottom: 0.6rem;
+    }
+
+    .influence-desc {
+      font-size: 0.88rem;
+      color: var(--ink-mid);
+      line-height: 1.6;
+    }
+
+    .influence-arrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 680px) {
+      .page-header-inner { grid-template-columns: 1fr; }
+      .event-card { grid-template-columns: 1fr; }
+      .event-year { writing-mode: horizontal-tb; transform: none; border-right: none; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="nav-placeholder"></div>
+
+  <!-- ── PAGE HEADER ────────────────────────────────────── -->
+  <header class="page-header">
+    <div class="container">
+      <div class="page-header-inner">
+        <div>
+          <span class="label">// Chapter 01</span>
+          <h1>History of<br/><em style="color:var(--rust)">Domain Specific Languages</em></h1>
+          <p class="mt-3" style="max-width:560px;font-size:1.1rem;">
+            A seventy-year arc from punchcards to natural language interfaces —
+            tracing how humans invented languages to speak directly to machines about specific problems.
+          </p>
+        </div>
+        <div class="page-num">01 / 05</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── INTRO ──────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="divider"><span class="divider-icon">// origins</span></div>
+      <div style="max-width:720px;">
+        <p class="reveal" style="font-size:1.1rem;">
+          The story of domain specific languages is really the story of humans trying to bridge
+          the semantic gap between <em>how we think about problems</em> and <em>how computers
+          execute instructions</em>. Every DSL is an answer to the question: what if the computer
+          spoke our language, not the other way around?
+        </p>
+        <p class="mt-3 reveal reveal-delay-1" style="font-size:1.05rem;">
+          This history predates object-oriented programming, the internet, and most of what we
+          consider modern software. It begins in the 1950s with engineers who were frustrated
+          that machine code bore no resemblance to the mathematical formulae they were trying
+          to express.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TIMELINE ───────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="timeline">
+
+        <!-- ERA 1: PIONEERS -->
+        <div class="era reveal">
+          <div class="era-header">
+            <span class="era-date">1950s – 1960s</span>
+            <span class="era-title">The Pioneers: Language as Liberation</span>
+          </div>
+          <div class="events">
+
+            <div class="event-card">
+              <div class="event-year">1954</div>
+              <div class="event-body">
+                <h4>FORTRAN — The First Domain Specific Language <span class="pill pill--rust">formula translation</span></h4>
+                <p>
+                  John Backus at IBM created FORTRAN (FORmula TRANslation) — widely considered the
+                  first high-level programming language and the first DSL. Its domain was scientific
+                  and mathematical computation. Engineers could write <code>Y = A*X**2 + B*X + C</code>
+                  instead of wrestling with machine instructions. IBM's management was sceptical —
+                  they expected the compiled code to be too slow. Backus bet his career on it.
+                  It was faster than hand-written assembly for most programs.
+                </p>
+                <pre><span style="color:#E8A83E;">C</span>     FORTRAN IV – Gaussian elimination (circa 1962)
+      DO 10 I = 1, N
+        DO 10 J = I+1, N
+          RATIO = A(J,I)/A(I,I)
+          DO 10 K = I, N+1
+10          A(J,K) = A(J,K) - RATIO*A(I,K)</pre>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">1959</div>
+              <div class="event-body">
+                <h4>COBOL — The Business Domain <span class="pill pill--amber">data processing</span></h4>
+                <p>
+                  Grace Hopper championed the idea that business data processing needed its own
+                  language — one readable by managers, not just mathematicians. COBOL's syntax
+                  reads like English prose: <code>MOVE CUSTOMER-BALANCE TO INVOICE-AMOUNT</code>.
+                  This was deliberate — Hopper believed self-documenting code was the future.
+                  Today, an estimated 95 billion lines of COBOL still run, processing
+                  an estimated $3 trillion in daily commerce through banking systems.
+                </p>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">1962</div>
+              <div class="event-body">
+                <h4>SIMSCRIPT — Simulation as a Domain <span class="pill pill--sage">discrete events</span></h4>
+                <p>
+                  RAND Corporation developed SIMSCRIPT specifically for discrete-event simulation.
+                  It introduced entities, attributes, and sets — concepts that map directly onto
+                  simulation theory. This was a landmark: rather than shoehorning simulation
+                  concepts into a general language, a language was designed <em>around</em> those
+                  concepts. The legacy lives on in modern simulation frameworks.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ERA 2: THE DATABASE REVOLUTION -->
+        <div class="era reveal">
+          <div class="era-header amber">
+            <span class="era-date amber">1970s – 1980s</span>
+            <span class="era-title">The Database Revolution & Unix Tools</span>
+          </div>
+          <div class="events">
+
+            <div class="event-card">
+              <div class="event-year">1974</div>
+              <div class="event-body">
+                <h4>SQL — The DSL That Conquered Data <span class="pill pill--amber">query language</span></h4>
+                <p>
+                  IBM researchers Donald Chamberlin and Raymond Boyce created SEQUEL (later SQL)
+                  based on Edgar Codd's relational model. The insight was genius in its simplicity:
+                  describe <em>what</em> data you want, not <em>how</em> to retrieve it.
+                  The query optimiser handles the how. This declarative paradigm was radical —
+                  and it worked so well that SQL survived multiple "death" predictions to become
+                  the most widely used DSL in history, running on virtually every device on earth.
+                </p>
+                <pre><span style="color:#E8A83E;">-- The iconic SELECT — describe the result, not the algorithm</span>
+SELECT customer_name, SUM(order_total) AS lifetime_value
+FROM orders
+JOIN customers USING (customer_id)
+WHERE order_date >= '2020-01-01'
+GROUP BY customer_name
+HAVING lifetime_value > 10000
+ORDER BY lifetime_value DESC;</pre>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">1976</div>
+              <div class="event-body">
+                <h4>Make — The Build Domain <span class="pill">build automation</span></h4>
+                <p>
+                  Stuart Feldman at Bell Labs wrote Make over a weekend after a colleague's bug
+                  was caused by forgetting to recompile a modified file. The Makefile syntax —
+                  targets, dependencies, recipes — is a simple DSL for expressing build graphs.
+                  Feldman later won the ACM Software System Award for Make. Its core idea —
+                  <em>dependency-driven execution</em> — remains the basis of every modern
+                  build system from Bazel to Gradle.
+                </p>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">1977</div>
+              <div class="event-body">
+                <h4>AWK — Text Processing as a Domain <span class="pill pill--sage">data munging</span></h4>
+                <p>
+                  Aho, Weinberger, and Kernighan created AWK as a specialised language for
+                  scanning and processing text files. Its design philosophy was radical compression
+                  of common operations: a field separator, pattern–action pairs, and implicit
+                  iteration over records. A one-liner AWK script could replace fifty lines of C.
+                  It defined a generation of Unix-philosophy DSLs: sed, grep, and eventually Perl.
+                </p>
+                <pre><span style="color:#E8A83E;"># Sum the third column of a CSV in AWK</span>
+awk -F',' '{ sum += $3 } END { print "Total:", sum }' data.csv</pre>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">1986</div>
+              <div class="event-body">
+                <h4>TeX & LaTeX — Mathematical Typesetting <span class="pill pill--rust">typesetting</span></h4>
+                <p>
+                  Donald Knuth, dissatisfied with the typesetting quality of his <em>The Art of
+                  Computer Programming</em> volumes, spent nine years building TeX — a complete
+                  typesetting language. Leslie Lamport later built LaTeX as a higher-level DSL
+                  on top of TeX. LaTeX became the universal language of academic publishing in
+                  mathematics, physics, and computer science — because no general-purpose tool
+                  could express <code>\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}</code>
+                  with the precision and beauty that LaTeX could.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PARSE TREE INTERLUDE -->
+        <div class="parse-tree-section reveal">
+          <div class="parse-tree-title">// parse tree — SQL: SELECT name FROM users WHERE id = 1</div>
+          <svg viewBox="0 0 700 280" style="max-width:700px;width:100%;font-family:'JetBrains Mono',monospace;" xmlns="http://www.w3.org/2000/svg">
+
+            <!-- Root -->
+            <rect x="275" y="10" width="150" height="36" rx="4" fill="#FAF6EF" stroke="#C8872A" stroke-width="1.5"/>
+            <text x="350" y="33" text-anchor="middle" font-size="12" fill="#2C2416">SelectStatement</text>
+
+            <!-- Level 2 connections -->
+            <line x1="350" y1="46" x2="130" y2="85" stroke="#C8BAA2" stroke-width="1.5"/>
+            <line x1="350" y1="46" x2="350" y2="85" stroke="#C8BAA2" stroke-width="1.5"/>
+            <line x1="350" y1="46" x2="570" y2="85" stroke="#C8BAA2" stroke-width="1.5"/>
+
+            <!-- SELECT keyword -->
+            <rect x="55"  y="85" width="150" height="36" rx="18" fill="#e8f0d8" stroke="#5A7A5A" stroke-width="1.5"/>
+            <text x="130" y="108" text-anchor="middle" font-size="12" fill="#2C2416">SELECT</text>
+
+            <!-- Column list -->
+            <rect x="275" y="85" width="150" height="36" rx="4" fill="#FAF6EF" stroke="#C8872A" stroke-width="1.5"/>
+            <text x="350" y="108" text-anchor="middle" font-size="12" fill="#2C2416">ColumnList</text>
+
+            <!-- WHERE clause -->
+            <rect x="495" y="85" width="150" height="36" rx="4" fill="#FAF6EF" stroke="#C8872A" stroke-width="1.5"/>
+            <text x="570" y="108" text-anchor="middle" font-size="12" fill="#2C2416">WhereClause</text>
+
+            <!-- Level 3: Column -->
+            <line x1="350" y1="121" x2="350" y2="160" stroke="#C8BAA2" stroke-width="1.5"/>
+            <rect x="290" y="160" width="120" height="36" rx="18" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <text x="350" y="183" text-anchor="middle" font-size="12" fill="#2C2416">name</text>
+
+            <!-- Level 3: WHERE children -->
+            <line x1="570" y1="121" x2="480" y2="160" stroke="#C8BAA2" stroke-width="1.5"/>
+            <line x1="570" y1="121" x2="570" y2="160" stroke="#C8BAA2" stroke-width="1.5"/>
+            <line x1="570" y1="121" x2="660" y2="160" stroke="#C8BAA2" stroke-width="1.5"/>
+
+            <rect x="415" y="160" width="60" height="36" rx="18" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <text x="445" y="183" text-anchor="middle" font-size="12" fill="#2C2416">id</text>
+
+            <rect x="545" y="160" width="50" height="36" rx="18" fill="#e8f0d8" stroke="#5A7A5A" stroke-width="1.5"/>
+            <text x="570" y="183" text-anchor="middle" font-size="12" fill="#2C2416">=</text>
+
+            <rect x="625" y="160" width="60" height="36" rx="18" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <text x="655" y="183" text-anchor="middle" font-size="12" fill="#2C2416">1</text>
+
+            <!-- FROM -->
+            <line x1="130" y1="121" x2="130" y2="160" stroke="#C8BAA2" stroke-width="1.5"/>
+            <rect x="55" y="160" width="150" height="36" rx="4" fill="#FAF6EF" stroke="#C8872A" stroke-width="1.5"/>
+            <text x="130" y="183" text-anchor="middle" font-size="12" fill="#2C2416">FROM users</text>
+
+            <!-- Legend -->
+            <rect x="20"  y="240" width="14" height="14" rx="7" fill="#F2C9B8" stroke="#B54A1C" stroke-width="1.5"/>
+            <text x="40" y="252" font-size="10" fill="#6B5D47">terminal (literal value)</text>
+            <rect x="200" y="240" width="14" height="14" rx="2" fill="#FAF6EF" stroke="#C8872A" stroke-width="1.5"/>
+            <text x="220" y="252" font-size="10" fill="#6B5D47">non-terminal (grammar rule)</text>
+            <rect x="420" y="240" width="14" height="14" rx="7" fill="#e8f0d8" stroke="#5A7A5A" stroke-width="1.5"/>
+            <text x="440" y="252" font-size="10" fill="#6B5D47">keyword</text>
+
+          </svg>
+        </div>
+
+        <!-- ERA 3: WEB ERA -->
+        <div class="era reveal">
+          <div class="era-header sage">
+            <span class="era-date sage">1990s – 2000s</span>
+            <span class="era-title">The Web Era & The Rise of Markup DSLs</span>
+          </div>
+          <div class="events">
+
+            <div class="event-card">
+              <div class="event-year">1991</div>
+              <div class="event-body">
+                <h4>HTML — Hypertext as Domain <span class="pill pill--sage">markup</span></h4>
+                <p>
+                  Tim Berners-Lee proposed HTML as a way to describe the <em>structure</em>
+                  of hypertext documents — not their appearance, not their behaviour,
+                  just their semantic structure. This domain-specificity was intentional and
+                  crucial. The initial spec was a DSL for documents with links. The browser
+                  handles the rest. Every webpage on earth is authored in a DSL.
+                </p>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">1996</div>
+              <div class="event-body">
+                <h4>CSS — Separating Style from Structure <span class="pill pill--sage">styling</span></h4>
+                <p>
+                  Håkon Wium Lie and Bert Bos proposed CSS to solve the "style chaos" of early
+                  HTML where <code>&lt;font&gt;</code> tags cluttered every document.
+                  CSS is a pure declaration language: you describe properties and selectors,
+                  and the browser's layout engine figures out the cascade, inheritance, and
+                  rendering. The selector grammar is itself a mini-DSL — a pattern language
+                  for matching document nodes.
+                </p>
+                <pre><span style="color:#E8A83E;">/* CSS Selectors — a pattern-matching DSL within a styling DSL */</span>
+article.featured > h2:first-child + p::first-line {
+  font-size: 1.25em;
+  font-style: italic;
+  color: oklch(42% 0.15 45);
+}</pre>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">1997</div>
+              <div class="event-body">
+                <h4>XML & XPath — Data and Navigation <span class="pill">data serialisation</span></h4>
+                <p>
+                  XML established a universal DSL for structured data exchange; XPath
+                  provided a DSL for navigating XML trees; XSLT for transforming them.
+                  Together they formed an ecosystem of DSLs-on-DSLs. While XML's verbosity
+                  later fell out of fashion, the concept — a dedicated language for tree
+                  navigation — survived in CSS selectors, jQuery, and modern JSON path expressions.
+                </p>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">2004</div>
+              <div class="event-body">
+                <h4>The Internal DSL Renaissance — Ruby on Rails <span class="pill pill--amber">internal DSL</span></h4>
+                <p>
+                  David Heinemeier Hansson's Rails framework demonstrated the power of
+                  <em>internal DSLs</em>: Ruby's flexible syntax allowed Rails to define
+                  a routing DSL, schema DSL, and validation DSL that read like prose.
+                  <code>has_many :through</code>, <code>validates :email, uniqueness: true</code> —
+                  these read like English declarations. Martin Fowler formalised the distinction
+                  between internal and external DSLs in his influential 2010 book, partly
+                  inspired by the Rails phenomenon.
+                </p>
+                <pre><span style="color:#E8A83E;"># Rails routing — an internal DSL that reads like a specification</span>
+Rails.application.routes.draw do
+  resources :articles do
+    member { post :publish }
+    collection { get :trending }
+  end
+  root to: 'home#index'
+end</pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ERA 4: MODERN -->
+        <div class="era reveal">
+          <div class="era-header teal">
+            <span class="era-date teal">2010s – Present</span>
+            <span class="era-title">Cloud, Infrastructure & Language-Oriented Programming</span>
+          </div>
+          <div class="events">
+
+            <div class="event-card">
+              <div class="event-year">2012</div>
+              <div class="event-body">
+                <h4>Terraform HCL — Infrastructure as Code <span class="pill pill--teal">infrastructure</span></h4>
+                <p>
+                  HashiCorp created HCL (HashiCorp Configuration Language) as a declarative DSL
+                  for expressing cloud infrastructure. Rather than scripting provisioning steps,
+                  engineers describe the <em>desired state</em> and Terraform computes the diff.
+                  This declarative, idempotent approach mirrors SQL's "describe what, not how"
+                  philosophy — applied to infrastructure. HCL is now the de-facto standard for
+                  infrastructure-as-code.
+                </p>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">2015</div>
+              <div class="event-body">
+                <h4>GraphQL — Queryable APIs <span class="pill pill--teal">API query</span></h4>
+                <p>
+                  Facebook open-sourced GraphQL as a DSL for describing exactly what data a
+                  client needs from an API. Unlike REST — which over-fetches or under-fetches —
+                  GraphQL queries mirror the shape of the desired response. It includes a type
+                  system, introspection, and fragments for composition. GraphQL is now used
+                  by GitHub, Shopify, Twitter, and thousands of other services.
+                </p>
+                <pre><span style="color:#E8A83E;"># GraphQL — ask for exactly what you need, nothing more</span>
+query UserProfile($id: ID!) {
+  user(id: $id) {
+    name
+    avatar { url width height }
+    recentPosts(limit: 5) {
+      title
+      publishedAt
+      tags { name }
+    }
+  }
+}</pre>
+              </div>
+            </div>
+
+            <div class="event-card">
+              <div class="event-year">2020s</div>
+              <div class="event-body">
+                <h4>LLM Prompt Engineering — An Emergent DSL? <span class="pill pill--rust">emerging</span></h4>
+                <p>
+                  As large language models became production tools, the craft of prompting
+                  emerged as an informal DSL: chain-of-thought delimiters, few-shot examples,
+                  role assignments, and structured output specifiers. Tools like
+                  DSPy, LMQL, and Guidance formalise this further — letting developers write
+                  programs that interleave natural language and code to steer LLM behaviour.
+                  Whether prompt engineering becomes a formal DSL or remains a craft is one
+                  of the defining questions of the current decade.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- end .timeline -->
+
+      <!-- KEY INFLUENCERS -->
+      <div class="divider mt-5"><span class="divider-icon">// key figures</span></div>
+      <h2 class="mb-4 reveal">The Architects</h2>
+      <div class="influence-grid">
+        <div class="influence-card reveal">
+          <div class="influence-name">John Backus</div>
+          <div class="influence-year">1924 – 2007</div>
+          <div class="influence-desc">Creator of FORTRAN and inventor of BNF notation — the grammar language for describing languages. His 1977 Turing Award lecture challenged imperative programming itself.</div>
+          <div class="influence-arrow">FORTRAN → BNF → FP</div>
+        </div>
+        <div class="influence-card amber reveal reveal-delay-1">
+          <div class="influence-name">Grace Hopper</div>
+          <div class="influence-year">1906 – 1992</div>
+          <div class="influence-desc">Creator of the first compiler and champion of COBOL. She believed programming languages should be readable by humans, not just machines — a radical idea in 1952.</div>
+          <div class="influence-arrow">COBOL → human-readable DSL</div>
+        </div>
+        <div class="influence-card sage reveal reveal-delay-2">
+          <div class="influence-name">Edgar F. Codd</div>
+          <div class="influence-year">1923 – 2003</div>
+          <div class="influence-desc">Invented the relational model that made SQL possible. His twelve rules for relational databases defined a mathematical framework that SQL operationalised.</div>
+          <div class="influence-arrow">Relational model → SQL</div>
+        </div>
+        <div class="influence-card teal reveal reveal-delay-3">
+          <div class="influence-name">Donald Knuth</div>
+          <div class="influence-year">b. 1938</div>
+          <div class="influence-desc">Creator of TeX, LR parsing theory, and literate programming. Demonstrated that a DSL can achieve levels of quality — in typesetting — that general tools cannot.</div>
+          <div class="influence-arrow">TeX → metafont → literate prog.</div>
+        </div>
+        <div class="influence-card reveal reveal-delay-1">
+          <div class="influence-name">Martin Fowler</div>
+          <div class="influence-year">b. 1963</div>
+          <div class="influence-desc">Formalised the vocabulary of DSL design: internal vs external, fluent interfaces, language workbenches. His 2010 book remains the field's canonical reference.</div>
+          <div class="influence-arrow">DSL patterns → language workbenches</div>
+        </div>
+        <div class="influence-card amber reveal reveal-delay-2">
+          <div class="influence-name">Tim Berners-Lee</div>
+          <div class="influence-year">b. 1955</div>
+          <div class="influence-desc">Invented HTML — arguably the world's most impactful DSL. His insistence on domain focus (structure, not style) led directly to CSS as a separate specialised language.</div>
+          <div class="influence-arrow">HTML → CSS → SPARQL</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div style="text-align:center;padding:2rem 0;" class="reveal">
+    <a href="applications.html" class="btn btn-primary">Next: Applications & Case Studies →</a>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  <script src="js/nav.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>
